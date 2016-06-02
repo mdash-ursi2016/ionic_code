@@ -5,6 +5,7 @@
   <ion-title>Settings</ion-title>
 </ion-navbar>
 
+<!-- For each item in the list, create a button for it and attach the itemTapped function -->
 <ion-content>
   <ion-list>
     <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">
@@ -15,11 +16,8 @@
       </div>
     </button>
   </ion-list>
-  <div *ngIf="selectedItem" padding>
-    You selected <b>{{selectedItem.title}}</b>
-  </div>
 
-
+  <!-- A simple list of toggles. As of now they don't have functions. Start unchecked -->
   <ion-list>
     <ion-list-header> Devices Options </ion-list-header>
     <ion-item>
@@ -34,4 +32,6 @@
     </ion-item>
 
   </ion-list>
+
+
 </ion-content>

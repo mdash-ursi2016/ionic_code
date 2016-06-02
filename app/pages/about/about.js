@@ -10,14 +10,14 @@ export class AboutPage {
   }
   constructor(nav) {this.nav = nav;}
 
-
+  /* A simple alert function to simply version info for the app */
   aboutAlert() {
     let alert = Alert.create({
       title: 'App Info',
       message: 'Version 1.0.0<br>Last Updated: June 2, 2016',
       buttons: ['Ok']
     });
-    console.log("made it this far");
+    /* Actually display the alert */
     this.nav.present(alert);
 
   }

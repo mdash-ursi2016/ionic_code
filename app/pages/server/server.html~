@@ -1,0 +1,18 @@
+
+<ion-navbar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>Server Settings</ion-title>
+</ion-navbar>
+
+
+<ion-content padding class="server">
+
+  <p>
+     Settings for the server go here.
+  </p>
+
+  <div block button nav-pop> Back to Settings</div>
+
+</ion-content>
