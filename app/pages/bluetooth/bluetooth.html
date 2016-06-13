@@ -13,10 +13,8 @@
      Settings for Bluetooth.
   </p>
 
-  <button block dark (click)="scan()">Scan for Devices</button>
+  <button block dark (click)="scan()">Scan and Connect</button>
   <button block stable (click)="disconnect()">Disconnect</button>
-  <button class="button button-balanced" (click)="bleCheck()">Check BLE</button>
-  <button class="button button-royal" (click)="enable()">Enable Bluetooth</button>
 
   <!-- Display the current status -->
   
@@ -28,12 +26,7 @@
 
   <div id="content">Data will display here</div>
   <br>
-
-  <p>---------------------</p>
   
-  <p> Device ID: </p>
-  <div id="connectDiv"></div>
-  <br>
   <!-- Pop back to the previous page-->
   <div block button nav-pop> Back to Settings</div>
 
