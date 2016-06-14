@@ -1,122 +1,125 @@
 import {BluetoothPage} from '../bluetooth/bluetooth';
-import {Page, Storage, SqlStorage} from 'ionic-angular';
+import {Page, Storage, SqlStorage, NavController, Loading} from 'ionic-angular';
 import {Chart} from 'chart.js';
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
-  constructor() {
-      /* The global storage unit. Perhaps move to HomePage.storage? */
-      BluetoothPage.storage = new Storage(SqlStorage);
-  }
+    static get parameters() {
+	/* Used for Loading */
+	return [[NavController]];
+    }
 
-  onPageLoaded()with the
+    constructor(nav) {
+	/* The global storage unit. Perhaps move to HomePage.storage? */
+	BluetoothPage.storage = new Storage(SqlStorage);
+	HomePage.labels = ["0"];
+	HomePage.db = [0];
+	/* Used for Loading */
+	this.nav = nav;
+    }
+
+  onPageLoaded()
     {
-	/* Currently breaks if you select the Homp Page *from* the Home Page */
-	HomePage.makeChart2();
+	HomePage.makeChart();
     }
 
-    /* Clear all data in storage and update the chart.
-       This method will be buried in some settings page eventually */
-    clear() {
-	BluetoothPage.storage.clear().then();
-	HomePage.data = google.visualization.arrayToDataTable(HomePage.dataset);
-	HomePage.updateChart();
-    }
 
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
+	
+	var i; /* Used for indexing the data */
+	var j = 1; /* Because the data load is asynchronous with the display, this variable maintains the correct index */
+	
+	/* Create and display a loading icon while the graph is retrieved and generatd */
+	let loading = Loading.create({spinner: 'dots',content: 'Loading Graph...'});
+	this.nav.present(loading);
 
-      var i; /* Used for indexing the data */
-      var j = 1; /* Because the data load is asynchronous with the display, this variable maintains the correct index */
-
-      for (i = 1; i < 50; i++)
+	/* Populate data with fake data for testing -- remove later */
+	for (i = 1; i < 50; i++) {
+	    BluetoothPage.storage.set(i.toString(),i);
+	}
+	/* Retrieve fixed amount of data from storage */
+	for (i = 1; i < 50; i++)
 	  {
 	      /* Get the current index's value from storage */
 	      BluetoothPage.storage.get(i.toString()).then(
 		  function(value) {
 		      /* Add the index and the (parsed) value to the data table */
-		      HomePage.data.addRows([
-			  [j.toString(),parseInt(value)]]);
+		      //HomePage.data.addRows([
+			//  [j.toString(),parseInt(value)]]);;
+		      HomePage.labels.push(j.toString());
+		      HomePage.db.push(parseInt(value));
+
 		      /* The index is likely way higher now, so use j to record our place */
 		      j++;
-		      HomePage.updateChart();
+
+		      /* Only make the chart on the last iteration */
+		      if (j==50) {loading.dismiss(); HomePage.makeChart();}
 		  },
 	          function(value) { alert("Error"); }
 	      );
+	  }
+
+	/* Unused prototype code for calling a timeout until all data is fetched, then graphing */
+	/*
+	ready_wait();
+	function ready_wait() {
+	    if (!(j = 50)) {
+		alert("go");
+		setTimeout(ready_wait(),50);
+	    }
+	    else {
+		alert(j);
+		alert(HomePage.labels);
+		alert("done");
+		HomePage.makeChart();
+	    }
+	}*/
 	      
-          }
-     }
+    }
 
-    
-  /* Make the chart for the first time */
-  static makeChart() {
-      /* The graph must start with a data point unfortunately, but switching to a different graphics
-	 package should solve that */
-      HomePage.dataset = [['Unit', 'Rate'], ['Init',0]];
-      if (!this.loaded)
-	  google.charts.load('current', {'packages':['corechart']});
-      this.loaded = true;
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-	  /* Turn the data array into a data table */
-	  HomePage.data = google.visualization.arrayToDataTable(HomePage.dataset);
+    /* Erase the current graph and redraw with no data */
+    clear() {
+	/* This line needs to be removed eventually, of course, and hidden in settings */
+	BluetoothPage.storage.clear().then();
+	HomePage.labels = [];
+	HomePage.db = [];
+	HomePage.makeChart();
+    }
 
-          HomePage.options = {
-          title: 'Chart Demo',
-          legend: { position: 'bottom' }
-              };
 
-          HomePage.chart = new google.visualization.LineChart(document.getElementById('chart'));
-
-          HomePage.updateChart();
-       }
-  }
-  
-  /* Redraw the chart with the most current data */
-  static updateChart() {
-      HomePage.chart.draw(HomePage.data, HomePage.options);
-  }
-
-  
-    static makeChart2() {
-	var ctx = document.getElementById("chart");
+    /* Charts.js graph routine */
+    static makeChart() {
+	var ctx = document.getElementById("chart2");
 	var myChart = new Chart(ctx, {
-	    type: 'bar',
+	    type: 'line',
 	    data: {
-		labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+		labels: HomePage.labels,
 		datasets: [{
-		    label: '# of Votes',
-		    data: [12, 19, 3, 5, 2, 3],
-		    backgroundColor: [
-			'rgba(255, 99, 132, 0.2)',
-			'rgba(54, 162, 235, 0.2)',
-			'rgba(255, 206, 86, 0.2)',
-			'rgba(75, 192, 192, 0.2)',
-			'rgba(153, 102, 255, 0.2)',
-			'rgba(255, 159, 64, 0.2)'
-		    ],
-		    borderColor: [
-			'rgba(255,99,132,1)',
-			'rgba(54, 162, 235, 1)',
-			'rgba(255, 206, 86, 1)',
-			'rgba(75, 192, 192, 1)',
-			'rgba(153, 102, 255, 1)',
-			'rgba(255, 159, 64, 1)'
-		    ],
+		    label: "Heart Rate",
+		    fill: false,
+		    lineTension: 0.1,
+		    backgroundColor: "rgba(75,192,192,0.4)",
+		    borderColor: "rgba(75,192,192,1)",
+		    borderCapStyle: 'butt',
+		    borderDash: [],
+		    borderDashOffset: 0.0,
+		    borderJoinStyle: 'miter',
+		    pointBorderColor: "rgba(75,192,192,1)",
+		    pointBackgroundColor: "#fff",
+		    pointBorderWidth: 1,
+		    pointHoverRadius: 5,
+		    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+		    pointHoverBorderColor: "rgba(220,220,220,1)",
+		    pointHoverBorderWidth: 2,
+		    pointRadius: 1,
+		    pointHitRadius: 10,
+		    data: HomePage.db,
 		    borderWidth: 1
 		}]
 	    },
-	    options: {
-		scales: {
-		    yAxes: [{
-			ticks: {
-			    beginAtZero:true
-			}
-		    }]
-		}
-	    }
 	});
     }
 
