@@ -14,53 +14,53 @@ export class HomePage {
     constructor(nav) {
 	/* The global storage unit. Perhaps move to HomePage.storage? */
 	BluetoothPage.storage = new Storage(SqlStorage);
-	HomePage.labels = ["0"];
-	HomePage.db = [0];
+
 	/* Used for Loading */
 	this.nav = nav;
     }
 
+  /* Draw an empty graph when the page is first loaded */
   onPageLoaded()
     {
+	HomePage.labels = [];
+	HomePage.db = [];
 	HomePage.makeChart();
     }
 
 
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
-	
-	var i; /* Used for indexing the data */
 	var j = 1; /* Because the data load is asynchronous with the display, this variable maintains the correct index */
-	
+	var i;
+
 	/* Create and display a loading icon while the graph is retrieved and generatd */
 	let loading = Loading.create({spinner: 'dots',content: 'Loading Graph...'});
 	this.nav.present(loading);
 
 	/* Populate data with fake data for testing -- remove later */
-	for (i = 1; i < 50; i++) {
-	    BluetoothPage.storage.set(i.toString(),i);
-	}
+	//for (i = 1; i < 20; i++) {
+	//    BluetoothPage.storage.set(i.toString(),i);
+	//}
+
 	/* Retrieve fixed amount of data from storage */
-	for (i = 1; i < 50; i++)
+	for (i = 1; i < 51; i++)
 	  {
 	      /* Get the current index's value from storage */
 	      BluetoothPage.storage.get(i.toString()).then(
 		  function(value) {
-		      /* Add the index and the (parsed) value to the data table */
-		      //HomePage.data.addRows([
-			//  [j.toString(),parseInt(value)]]);;
 		      HomePage.labels.push(j.toString());
 		      HomePage.db.push(parseInt(value));
 
 		      /* The index is likely way higher now, so use j to record our place */
 		      j++;
 
-		      /* Only make the chart on the last iteration */
+		      /* Make the chart on the last iteration */
 		      if (j==50) {loading.dismiss(); HomePage.makeChart();}
-		  },
-	          function(value) { alert("Error"); }
+		  },  
+		  function(value) { alert("Error"); }
 	      );
 	  }
+    }
 
 	/* Unused prototype code for calling a timeout until all data is fetched, then graphing */
 	/*
@@ -78,7 +78,6 @@ export class HomePage {
 	    }
 	}*/
 	      
-    }
 
     /* Erase the current graph and redraw with no data */
     clear() {
