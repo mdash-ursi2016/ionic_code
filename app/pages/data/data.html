@@ -1,0 +1,23 @@
+
+<ion-navbar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>Data Page</ion-title>
+</ion-navbar>
+
+
+<ion-content padding class="data">
+
+  <h3>Data Page</h3>
+  <p>
+     This is  where all the long term visualization would go.
+  </p>
+
+  <button (click)="retrieve()">Retrieve Data</button><button (click)="clear()">Clear Data</button>
+  
+  <br>
+
+  <canvas id="chart">Not supported</canvas>
+
+</ion-content>
