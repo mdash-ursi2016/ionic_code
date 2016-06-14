@@ -92,7 +92,7 @@ export class HomePage {
 
     /* Charts.js graph routine */
     static makeChart() {
-	var ctx = document.getElementById("chart2");
+	var ctx = document.getElementById("chart");
 	var myChart = new Chart(ctx, {
 	    type: 'line',
 	    data: {
