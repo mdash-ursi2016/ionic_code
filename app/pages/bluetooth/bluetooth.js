@@ -89,7 +89,7 @@ export class BluetoothPage {
 	      function scanSuccess(peripheral) {
 		  console.log("Found a BLE device: " + JSON.stringify(peripheral));
 		  foundDevice = true;
-		  Vibration.vibrate(1000);
+		  Vibration.vibrate(100);
 		  subscription.unsubscribe();
 		  statusDiv.innerHTML = "Found device";
 		  alert("Device Found: " + peripheral.name);
