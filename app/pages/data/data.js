@@ -33,7 +33,7 @@ export class DataPage {
 	var j = 1; /* Because the data load is asynchronous with the display, this variable maintains the correct index */
 	var i;
 
-	/* Create and display a loading icon while the graph is retrieved and generatd */
+	/* Create and display a loading icon while the graph is retrieved and generated */
 	let loading = Loading.create({spinner: 'dots',content: 'Loading Graph...'});
 	this.nav.present(loading);
 

@@ -1,5 +1,5 @@
 import {BluetoothPage} from '../bluetooth/bluetooth';
-import {Page, Storage, SqlStorage} from 'ionic-angular';
+import {Page} from 'ionic-angular';
 import {BLE} from 'ionic-native';
 
 @Page({
@@ -10,42 +10,59 @@ export class HomePage {
     constructor() {}
 
     onPageLoaded() {
-	//HomePage.points = [];
-	//alert("a")
+	/* Retrieve information about the canvas and its context */
 	HomePage.c = document.getElementById("myCanvas");
-	HomePage.ctx = c.getContext("2d");
-	//alert("b");
-	HomePage.ctx.moveTo(0,100);
-	//alert("c");
+	HomePage.ctx = HomePage.c.getContext("2d");
+
+	/* Set the canvas dimension according to the device */
+	HomePage.c.width = window.screen.width - 50;
+	HomePage.c.height = (window.screen.height / 3);
+
+	/* The background is black and the line is green */
+	HomePage.ctx.fillStyle = "#000000";
+	HomePage.ctx.fillRect(0,0,HomePage.c.width,HomePage.c.height);
+	HomePage.ctx.strokeStyle = "#458B00";
+
+
+	/* The first point is actually offscreen so a big jump doesn't get drawn */
+	HomePage.ctx.moveTo(-2,0);
+	HomePage.ctx.beginPath();
 	HomePage.i = 0;
-	//alert("Page Loaded");
+
+	/* If we have a device to connect to, start up the data relay */
+	if (BluetoothPage.peripheral.id != null) HomePage.connect();
     }
 
-    connect() {
+    static connect() {
+	/* Subscribe to incoming data packets */
 	var connectSub = BLE.startNotification(BluetoothPage.peripheral.id, '180d', '2a37').subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
-	    content.innerHTML = data[1];
-	    //HomePage.points.push(data[1]);
-	    HomePage.start(data[1]);
+	    
+	    /* Update the HTML for the latest packet */
+	    content.innerHTML = "Your heart rate is currently <b>" + data[1] +  "</b> BPM";
+	    
+	    /* Draw the most recent point */
+	    HomePage.draw(data[1]);
 	});
     }
 
 
-  
-    static start(point) {
+    /* Given a point, draw it on the canvas and erase if the canvas is full */
+    static draw(point) {
+	/* Increment by 2 for more noticeable drawing changes */
 	HomePage.i += 2;
-	//alert(HomePage.i);
-	//alert(point);
-	//alert(typeof point);
-	HomePage.ctx.lineTo(HomePage.i, point);
+	HomePage.ctx.lineTo(HomePage.i, (HomePage.c.height - point));
 	HomePage.ctx.stroke();
-	alert("1");
-	if (HomePage.i > 200)
+	
+	/* If the index (x-axis) is out of bounds, reset canvas */
+	if (HomePage.i > HomePage.c.width)
 	    {
-		HomePage.ctx.clearRect(0,0,200,120);
-		HomePage.ctx.moveTo(0,100);
+		//HomePage.ctx.clearRect(0,0,HomePage.c.width,HomePage.c.height);
+		HomePage.ctx.fillRect(0,0,HomePage.c.width,HomePage.c.height);
+		HomePage.ctx.beginPath();
+		HomePage.ctx.moveTo(0, HomePage.c.height - point);
+		HomePage.i = 0;
 	    }
-	alert("2");
     }
 
 }
