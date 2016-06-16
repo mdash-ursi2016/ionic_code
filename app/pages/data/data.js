@@ -13,7 +13,7 @@ export class DataPage {
 
     constructor(nav) {
 	/* The global storage unit. Perhaps move to DataPage.storage? */
-	BluetoothPage.storage = new Storage(SqlStorage);
+	//BluetoothPage.storage = new Storage(SqlStorage);
 
 	/* Used for Loading */
 	this.nav = nav;
