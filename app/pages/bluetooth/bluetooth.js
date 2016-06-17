@@ -1,6 +1,7 @@
-import {Page, Storage, SqlStorage} from 'ionic-angular';
+import {Page} from 'ionic-angular';
 import {BLE, Vibration, BackgroundMode} from 'ionic-native';
 import {StorageService} from '../storage/service';
+import {BLService} from '../blservice/blservice';
 
 @Page({
   templateUrl: 'build/pages/bluetooth/bluetooth.html'
@@ -8,11 +9,11 @@ import {StorageService} from '../storage/service';
 
 export class BluetoothPage {
     static get parameters() {
-	return [[StorageService]];
+	return [[StorageService], [BLService]];
     }
-  constructor(service) {
+  constructor(service, bl) {
       BluetoothPage.service = service;
-
+      this.bl = bl;
       /* Information for the Heart Rate service:
 	 service: Code for the Bluetooth Heart Rate service
 	 heartrate: Characteristic code in this service for heart rate
@@ -28,11 +29,16 @@ export class BluetoothPage {
     {
 	/* See if Bluetooth is connected to a device already */
 	BluetoothPage.checkExistingBluetooth();
+	BluetoothPage.content = content;
     }
 
     /* Scan for and connect to a peripheral device */
 
     init() {
+	this.bl.scan();
+    }
+
+    init2() {
 	/* Initialization, called first */
 	statusDiv.innerHTML = "Initializing";
 	document.addEventListener('deviceready', BluetoothPage.checkBluetooth(), false);
@@ -116,9 +122,12 @@ export class BluetoothPage {
     }
 
  
+    disconnect() {
+	this.bl.disconnect();
+    }
 
   /* Called when the user wants to sever the Bluetooth connection */
-  disconnect() {
+  disconnect2() {
 
       /* The device id that is currently connected, or null */
       var devID = BluetoothPage.peripheral.id;

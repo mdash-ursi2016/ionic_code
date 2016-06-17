@@ -6,10 +6,11 @@ import {SettingsPage} from './pages/settings/settings';
 import {AboutPage} from './pages/about/about';
 import {DataPage} from './pages/data/data';
 import {StorageService} from './pages/storage/service';
+import {BLService} from './pages/blservice/blservice';
 
 @App({
   templateUrl: 'build/app.html',
-  providers: [StorageService],
+  providers: [StorageService, BLService],
   config: {}, // http://ionicframework.com/docs/v2/api/config/Config/
   queries: {
     nav: new ViewChild('content')

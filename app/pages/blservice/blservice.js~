@@ -1,0 +1,12 @@
+import {BLE, Vibration} from 'ionic-native';
+import {Injectable} from 'angular2/core';
+
+@Injectable()
+export class BLService {
+    constructor() {}
+
+    init(statusDiv) {
+	this.statusDiv = statusDiv;
+	this.statusDiv.innerHTML = "AAAAH";
+    }
+	
