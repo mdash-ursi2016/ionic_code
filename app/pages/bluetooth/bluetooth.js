@@ -1,14 +1,17 @@
 import {Page, Storage, SqlStorage} from 'ionic-angular';
 import {BLE, Vibration, BackgroundMode} from 'ionic-native';
+import {StorageService} from '../storage/service';
 
 @Page({
   templateUrl: 'build/pages/bluetooth/bluetooth.html'
 })
 
 export class BluetoothPage {
-  constructor() {
-      /* SqlStorage Unit is now instantiated in the Home Page*/
-      //BluetoothPage.storage = new Storage(SqlStorage);
+    static get parameters() {
+	return [[StorageService]];
+    }
+  constructor(service) {
+      this.service = service;
   }
 
 
@@ -21,8 +24,6 @@ export class BluetoothPage {
 
   /* Scan for and connect to a peripheral device */
   scan() {
-      //BackgroundMode.enable().then(function() {alert("Yep!");}, function() {alert("Nope!");});
-  
       /* Information for the Heart Rate service:
 	   service: Code for the Bluetooth Heart Rate service
 	   heartrate: Characteristic code in this service for heart rate
@@ -122,12 +123,13 @@ export class BluetoothPage {
 	      /* Start reading data, update the HTML, and store */
 	      var count = 0;
 	      BLE.startNotification(peripheral.id, scanInfo.service, scanInfo.heartrate).subscribe(buffer => {
-										 var data = new Uint8Array(buffer);
-										 content.innerHTML = data[1];
-										 count += 1;
-										 BluetoothPage.storage.set(
-										     count.toString(),data[1]);
-										});
+		  var data = new Uint8Array(buffer);
+		  content.innerHTML = data[1];
+		  count += 1;
+		  alert(BluetoothPage.service);
+		  BluetoothPage.storage.set(
+		      count.toString(),data[1]);
+	      });
 	  }
 
       }

@@ -1,4 +1,4 @@
-import {Page, Storage, SqlStorage, NavController, Toast} from 'ionic-angular';
+import {Page, NavController, Toast} from 'ionic-angular';
 import {Chart} from 'chart.js';
 import {StorageService} from '../storage/service';
 
@@ -24,6 +24,14 @@ export class DataPage {
 	DataPage.labels = [];
 	DataPage.db = [];
 	DataPage.makeChart();
+    }
+
+    make() {
+	this.service.makeTable();
+    }
+    
+    store() {
+	this.service.store(Math.floor(Math.random() * 100) + 1);
     }
 
 
