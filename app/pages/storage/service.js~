@@ -1,0 +1,10 @@
+import {Storage, SqlStorage} from 'ionic-angular';
+import Injectable from 'angular2/core';
+
+@Injectable()
+export class StorageService {
+    constructor() {
+	this.storage = new Storage(SqlStorage);
+	alert("Made it");
+    }
+}

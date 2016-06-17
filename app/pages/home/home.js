@@ -1,13 +1,19 @@
 import {BluetoothPage} from '../bluetooth/bluetooth';
 import {Page, Storage, SqlStorage} from 'ionic-angular';
 import {BLE} from 'ionic-native';
+import {StorageService} from '../storage/service';
+
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
-
-    constructor() {}
+    static get parameters() {
+	return [[StorageService]];
+    }
+    constructor(service) {
+	this.service = service;
+    }
 
     onPageLoaded() {
 	
@@ -39,6 +45,7 @@ export class HomePage {
 	if (BluetoothPage.peripheral.id != null) HomePage.connect();
     }
 
+	
     static connect() {
 	/* Subscribe to incoming data packets */
 	var connectSub = BLE.startNotification(BluetoothPage.peripheral.id, '180d', '2a37').subscribe(buffer => {

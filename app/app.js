@@ -5,9 +5,11 @@ import {HomePage} from './pages/home/home';
 import {SettingsPage} from './pages/settings/settings';
 import {AboutPage} from './pages/about/about';
 import {DataPage} from './pages/data/data';
+import {StorageService} from './pages/storage/service';
 
 @App({
   templateUrl: 'build/app.html',
+  providers: [StorageService],
   config: {}, // http://ionicframework.com/docs/v2/api/config/Config/
   queries: {
     nav: new ViewChild('content')
