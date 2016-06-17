@@ -12,6 +12,14 @@ export class BluetoothPage {
     }
   constructor(service) {
       BluetoothPage.service = service;
+
+      /* Information for the Heart Rate service:
+	 service: Code for the Bluetooth Heart Rate service
+	 heartrate: Characteristic code in this service for heart rate
+	 timeout: Scan time before quitting */
+      BluetoothPage.scanInfo = { service: '180d',
+				 heartrate: '2a37',
+				 timeout: 25 };
   }
 
 
@@ -23,28 +31,16 @@ export class BluetoothPage {
     }
 
     /* Scan for and connect to a peripheral device */
-    scan() {
-      /* Information for the Heart Rate service:
-	 service: Code for the Bluetooth Heart Rate service
-	 heartrate: Characteristic code in this service for heart rate
-	 timeout: Scan time before quitting */
-      BluetoothPage.scanInfo = { service: '180d',
-				 heartrate: '2a37',
-				 timeout: 25 };
 
-      BluetoothPage.init();
-
-  }
-    static init() {
+    init() {
 	/* Initialization, called first */
 	statusDiv.innerHTML = "Initializing";
 	document.addEventListener('deviceready', BluetoothPage.checkBluetooth(), false);
 	//this.startScan();   //<-- Use when debugging on server instead of previous line
-	console.log("Operations completed");
     }
-    static checkBluetooth() {
-	
 
+    /* See if Bluetooth is enabled, or turn it on */
+    static checkBluetooth() {
 	/* Make sure Bluetooth is enabled, and if not attempt to turn it on */
 	BLE.isEnabled().then(
 	    /* Bluetooth is on already */
@@ -68,29 +64,17 @@ export class BluetoothPage {
 	);
     }
 
-
+    /* Begin scanning for a device */
     static startScan() {
+	/* Var used for timing out */
 	let foundDevice = false;
 	statusDiv.innerHTML = "Scanning";
 	
-	/* Notify the user of the device and unsubscribe. Then connect to device. */
-	function scanSuccess(peripheral) {
-	    console.log("Found a BLE device: " + JSON.stringify(peripheral));
-	    foundDevice = true;
-	    Vibration.vibrate(100);
-	    subscription.unsubscribe();
-	    statusDiv.innerHTML = "Found device";
-	    alert("Device Found: " + peripheral.name);
-	    var connectSub = BLE.connect(peripheral.id).subscribe(result => {
-		BluetoothPage.peripheral = peripheral;
-		BluetoothPage.connected(peripheral);
-		//connectSub.unsubscribe(); //hm
-	    });
-	}
 
 	/* Subscribe to the scan using heart rate service. If a device is found, pass it and the subscription along */
-	var subscription = BLE.scan([BluetoothPage.scanInfo.service], BluetoothPage.scanInfo.timeout).subscribe(device => 
-												{scanSuccess(device,subscription);});
+	var subscription = BLE.scan([BluetoothPage.scanInfo.service], BluetoothPage.scanInfo.timeout).subscribe(device => {
+	    scanSuccess(device,subscription);
+	});
 	      
 	/* If no device is found, that sucks. Update */
 	setTimeout(function() {
@@ -98,21 +82,35 @@ export class BluetoothPage {
 		statusDiv.innerHTML = "No device found";
 	    }
 	}, (BluetoothPage.scanInfo.timeout * 1000));
+
+
+	/* Success function for scan.  Notify the user of the device 
+	   and unsubscribe from new devices. Then connect to device. */
+	function scanSuccess(peripheral) {
+	    foundDevice = true;
+	    Vibration.vibrate(100);
+	    subscription.unsubscribe();
+	    statusDiv.innerHTML = "Found device";
+	    alert("Device Found: " + peripheral.name);
+	    var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+		/* Update device information and connect */
+		BluetoothPage.peripheral = peripheral;
+		BluetoothPage.connected(peripheral);
+	    });
+	}
+	
     }
 
+    /* When the device has successfully connected */
     static connected(peripheral) {
-	/* When the device has successfully connected */
 	statusDiv.innerHTML = "Connected to " + peripheral.name;
-	BluetoothPage.id = peripheral.id;
 	
 	//BackgroundMode.enable().then(alert("BGM Enabled"),alert("BGM *Not* Enabled"));
     
 	/* Start reading data, update the HTML, and store */
-	//var count = 0;
 	BLE.startNotification(peripheral.id, BluetoothPage.scanInfo.service, BluetoothPage.scanInfo.heartrate).subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 	    content.innerHTML = data[1];
-	    //count += 1;
 	    BluetoothPage.service.store(data[1]);
 	});
     }
@@ -123,7 +121,7 @@ export class BluetoothPage {
   disconnect() {
 
       /* The device id that is currently connected, or null */
-      var devID = BluetoothPage.id;
+      var devID = BluetoothPage.peripheral.id;
 
       BLE.isConnected(devID).then(
 	  /* Check if connected, and disconnect if so */
@@ -135,7 +133,6 @@ export class BluetoothPage {
 		      alert("Disconnected Successfully");
 		      /* Reset the peripheral ID */
 		      BluetoothPage.peripheral = null;
-		      BluetoothPage.id = null;
 		  },
 		  /* Could not disconnect for some reason */
 		  function(dcResult) {
@@ -151,10 +148,12 @@ export class BluetoothPage {
 
   /* On page load, we want the status to reflect if the device is connected already */
   static checkExistingBluetooth() {
-      BLE.isConnected(BluetoothPage.id).then(
-	  function() {statusDiv.innerHTML = "Connected to " + BluetoothPage.peripheral.name;},
-	  function() {statusDiv.innerHTML = "Disconnected";}
+      if (BluetoothPage.peripheral) {
+	  BLE.isConnected(BluetoothPage.peripheral.id).then(
+	      function() {statusDiv.innerHTML = "Connected to " + BluetoothPage.peripheral.name;},
+	      function() {statusDiv.innerHTML = "Disconnected";}
 	  );
+      }
   }    
 
 }
