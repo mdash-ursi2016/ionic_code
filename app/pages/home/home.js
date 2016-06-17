@@ -16,8 +16,6 @@ export class HomePage {
     }
 
     onPageLoaded() {
-	
-	BluetoothPage.storage = new Storage(SqlStorage);
 
 	HomePage.points = [];
 	HomePage.head = 0;
@@ -45,7 +43,16 @@ export class HomePage {
 	if (BluetoothPage.peripheral.id != null) HomePage.connect();
     }
 
-	
+    make() {
+	this.service.makeTable();
+    }
+
+    store() {
+	this.service.store(Math.floor(Math.random() * 100) + 1);
+    }
+    
+
+
     static connect() {
 	/* Subscribe to incoming data packets */
 	var connectSub = BLE.startNotification(BluetoothPage.peripheral.id, '180d', '2a37').subscribe(buffer => {

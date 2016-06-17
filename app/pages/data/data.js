@@ -1,22 +1,21 @@
-import {BluetoothPage} from '../bluetooth/bluetooth';
-import {Page, Storage, SqlStorage, NavController, Loading} from 'ionic-angular';
+import {Page, Storage, SqlStorage, NavController, Toast} from 'ionic-angular';
 import {Chart} from 'chart.js';
+import {StorageService} from '../storage/service';
 
 @Page({
   templateUrl: 'build/pages/data/data.html'
 })
 export class DataPage {
     static get parameters() {
-	/* Used for Loading */
-	return [[NavController]];
+	/* Used for Loading and Storage*/
+	return [[NavController], [StorageService]];
     }
 
-    constructor(nav) {
-	/* The global storage unit. Perhaps move to DataPage.storage? */
-	//BluetoothPage.storage = new Storage(SqlStorage);
-
+    constructor(nav,service) {
 	/* Used for Loading */
 	this.nav = nav;
+	/* Used for storage */
+	this.service = service;
     }
 
   /* Draw an empty graph when the page is first loaded */
@@ -30,59 +29,47 @@ export class DataPage {
 
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
-	var j = 1; /* Because the data load is asynchronous with the display, this variable maintains the correct index */
-	var i;
 
-	/* Create and display a loading icon while the graph is retrieved and generated */
-	let loading = Loading.create({spinner: 'dots',content: 'Loading Graph...'});
-	this.nav.present(loading);
+	let j = 0;
+	this.service.retrieve().then(
+	    function(value) {
+		/* A data object is returned, iterate through it */
+		for (var i = 0; i < value.res.rows.length; i++) {
+		    /* Add data to graphing arrays */
+		    DataPage.labels.push(i.toString());
+		    DataPage.db.push(value.res.rows.item(i).value);
 
-	/* Populate data with fake data for testing -- remove later */
-	//for (i = 1; i < 20; i++) {
-	//    BluetoothPage.storage.set(i.toString(),i);
-	//}
+		    /* Because retrieving data takes time, we have a third
+		       variable checking for the end of the loop to update
+		       the graph */
+		    j++;
+		    if (j == value.res.rows.length) {
+			DataPage.makeChart();
+		    }
 
-	/* Retrieve fixed amount of data from storage */
-	for (i = 1; i < 51; i++)
-	  {
-	      /* Get the current index's value from storage */
-	      BluetoothPage.storage.get(i.toString()).then(
-		  function(value) {
-		      DataPage.labels.push(j.toString());
-		      DataPage.db.push(parseInt(value));
+		}
+		
+	    },  
+	    function(value) { alert("Error"); }
+	);
+    }    
 
-		      /* The index is likely way higher now, so use j to record our place */
-		      j++;
-
-		      /* Make the chart on the last iteration */
-		      if (j==50) {loading.dismiss(); DataPage.makeChart();}
-		  },  
-		  function(value) { alert("Error"); }
-	      );
-	  }
-    }
-
-	/* Unused prototype code for calling a timeout until all data is fetched, then graphing */
-	/*
-	ready_wait();
-	function ready_wait() {
-	    if (!(j = 50)) {
-		alert("go");
-		setTimeout(ready_wait(),50);
-	    }
-	    else {
-		alert(j);
-		alert(DataPage.labels);
-		alert("done");
-		DataPage.makeChart();
-	    }
-	}*/
-	      
-
-    /* Erase the current graph and redraw with no data */
+    /* Erase the current graph and redraw with no data.
+       This function should eventually be hidden in settings */
     clear() {
-	/* This line needs to be removed eventually, of course, and hidden in settings */
-	BluetoothPage.storage.clear().then();
+	/* Delete the table and make a new one */
+	this.service.clear();
+	this.service.makeTable();
+	
+	/* Notify the event with a Toast */
+	let toast = Toast.create({
+            message: 'Table Cleared',
+            duration: 2000,
+            position: 'bottom'
+        });
+        this.nav.present(toast);
+
+	/* Reset the data and redraw the graph */
 	DataPage.labels = [];
 	DataPage.db = [];
 	DataPage.makeChart();
