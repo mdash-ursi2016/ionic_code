@@ -11,7 +11,7 @@ export class BluetoothPage {
 	return [[StorageService]];
     }
   constructor(service) {
-      this.service = service;
+      BluetoothPage.service = service;
   }
 
 
@@ -22,121 +22,102 @@ export class BluetoothPage {
 	BluetoothPage.checkExistingBluetooth();
     }
 
-  /* Scan for and connect to a peripheral device */
-  scan() {
+    /* Scan for and connect to a peripheral device */
+    scan() {
       /* Information for the Heart Rate service:
-	   service: Code for the Bluetooth Heart Rate service
-	   heartrate: Characteristic code in this service for heart rate
-	   timeout: Scan time before quitting */
-      var scanInfo = { service: '180d',
-		       heartrate: '2a37',
-		       timeout: 25 };
-      
-      /* If a Bluetooth device has been found, this will be true.
-	 Prevents incorrect status. */
-      var foundDevice;
+	 service: Code for the Bluetooth Heart Rate service
+	 heartrate: Characteristic code in this service for heart rate
+	 timeout: Scan time before quitting */
+      BluetoothPage.scanInfo = { service: '180d',
+				 heartrate: '2a37',
+				 timeout: 25 };
 
-      /* This is the object that controls connection to a device.
-	 All of its members are functions that will be called sequentially,
-	 starting with init() */
-      var bleApp = {
+      BluetoothPage.init();
 
-	  /* Initialization, called first */
-	  init: function() {
-	      statusDiv.innerHTML = "Initializing";
-	      document.addEventListener('deviceready', this.checkBluetooth(), false);
-	      //this.startScan();   //<-- Use when debugging on server instead of previous line
-	      console.log("Operations completed");
-	  },
+  }
+    static init() {
+	/* Initialization, called first */
+	statusDiv.innerHTML = "Initializing";
+	document.addEventListener('deviceready', BluetoothPage.checkBluetooth(), false);
+	//this.startScan();   //<-- Use when debugging on server instead of previous line
+	console.log("Operations completed");
+    }
+    static checkBluetooth() {
+	
 
-	  /* Make sure Bluetooth is enabled, and if not attempt to turn it on */
-	  checkBluetooth: function() {
-	      BLE.isEnabled().then(
-		  /* Bluetooth is on already */
-		  function() {
-		      bleApp.startScan();
-		  },
-		  /* Bluetooth is not on already */
-		  function() {
-		      BLE.enable().then(
-			  /* Bluetooth was successfully turned on */
-			  function() {
-			      bleApp.startScan();
-			  },
-			  /* Could not turn Bluetooth on */
-			  function() {
-			      statusDiv.innerHTML = "Disconnected";
-			      alert("Bluetooth could not be enabled");
-			  }
-		      );
-		  }
-	      );
-	  },
+	/* Make sure Bluetooth is enabled, and if not attempt to turn it on */
+	BLE.isEnabled().then(
+	    /* Bluetooth is on already */
+	    function() {
+		BluetoothPage.startScan();
+	    },
+	    /* Bluetooth is not on already */
+	    function() {
+		BLE.enable().then(
+		    /* Bluetooth was successfully turned on */
+		    function() {
+			BluetoothPage.startScan();
+		    },
+		    /* Could not turn Bluetooth on */
+		    function() {
+			statusDiv.innerHTML = "Disconnected";
+			alert("Bluetooth could not be enabled");
+		    }
+		);
+	    }
+	);
+    }
 
 
-	  startScan: function() {
-	      foundDevice = false;
-	      statusDiv.innerHTML = "Scanning";
+    static startScan() {
+	let foundDevice = false;
+	statusDiv.innerHTML = "Scanning";
+	
+	/* Notify the user of the device and unsubscribe. Then connect to device. */
+	function scanSuccess(peripheral) {
+	    console.log("Found a BLE device: " + JSON.stringify(peripheral));
+	    foundDevice = true;
+	    Vibration.vibrate(100);
+	    subscription.unsubscribe();
+	    statusDiv.innerHTML = "Found device";
+	    alert("Device Found: " + peripheral.name);
+	    var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+		BluetoothPage.peripheral = peripheral;
+		BluetoothPage.connected(peripheral);
+		//connectSub.unsubscribe(); //hm
+	    });
+	}
+
+	/* Subscribe to the scan using heart rate service. If a device is found, pass it and the subscription along */
+	var subscription = BLE.scan([BluetoothPage.scanInfo.service], BluetoothPage.scanInfo.timeout).subscribe(device => 
+												{scanSuccess(device,subscription);});
 	      
-	      /* Not sure how to implement a failure function with subscriptions, so this isn't
-		 currently used */
-	      function scanFailure(reason) {
-		  alert("Scan Failed");
-		  statusDiv.innerHTML = "Scan error";
-		  console.log("Could not find a BLE device");
-	      }
+	/* If no device is found, that sucks. Update */
+	setTimeout(function() {
+	    if (!foundDevice) {
+		statusDiv.innerHTML = "No device found";
+	    }
+	}, (BluetoothPage.scanInfo.timeout * 1000));
+    }
 
-	      /* Notify the user of the device and unsubscribe. Then connect to device. */
-	      function scanSuccess(peripheral) {
-		  console.log("Found a BLE device: " + JSON.stringify(peripheral));
-		  foundDevice = true;
-		  Vibration.vibrate(100);
-		  subscription.unsubscribe();
-		  statusDiv.innerHTML = "Found device";
-		  alert("Device Found: " + peripheral.name);
-		  var connectSub = BLE.connect(peripheral.id).subscribe(result => {
-		                                                          BluetoothPage.peripheral = peripheral;
-									  bleApp.connected(peripheral);
-		                                                          //connectSub.unsubscribe(); //hm
-									});
-	      }
+    static connected(peripheral) {
+	/* When the device has successfully connected */
+	statusDiv.innerHTML = "Connected to " + peripheral.name;
+	BluetoothPage.id = peripheral.id;
+	
+	//BackgroundMode.enable().then(alert("BGM Enabled"),alert("BGM *Not* Enabled"));
+    
+	/* Start reading data, update the HTML, and store */
+	//var count = 0;
+	BLE.startNotification(peripheral.id, BluetoothPage.scanInfo.service, BluetoothPage.scanInfo.heartrate).subscribe(buffer => {
+	    var data = new Uint8Array(buffer);
+	    content.innerHTML = data[1];
+	    //count += 1;
+	    BluetoothPage.service.store(data[1]);
+	});
+    }
 
-	      /* Subscribe to the scan using heart rate service. If a device is found, pass it and the subscription along */
-	      var subscription = BLE.scan([scanInfo.service], scanInfo.timeout).subscribe(device => 
-											  {scanSuccess(device,subscription);});
-	      
-	      /* If no device is found, that sucks. Update */
-	      setTimeout(function() {
-		  if (!foundDevice) {
-		      statusDiv.innerHTML = "No device found";
-		  }
-	      }, (scanInfo.timeout * 1000));
-	  },
-
-	  /* When the device has successfully connected */
-	  connected: function(peripheral) {
-	      statusDiv.innerHTML = "Connected to " + peripheral.name;
-	      BluetoothPage.id = peripheral.id;
-
-	      //BackgroundMode.enable().then(alert("BGM Enabled"),alert("BGM *Not* Enabled"));
-
-	      /* Start reading data, update the HTML, and store */
-	      var count = 0;
-	      BLE.startNotification(peripheral.id, scanInfo.service, scanInfo.heartrate).subscribe(buffer => {
-		  var data = new Uint8Array(buffer);
-		  content.innerHTML = data[1];
-		  count += 1;
-		  alert(BluetoothPage.service);
-		  BluetoothPage.storage.set(
-		      count.toString(),data[1]);
-	      });
-	  }
-
-      }
-
-     /* The kick off that starts everything */
-     bleApp.init();
-  }   
+ 
 
   /* Called when the user wants to sever the Bluetooth connection */
   disconnect() {
