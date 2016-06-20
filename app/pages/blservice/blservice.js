@@ -10,7 +10,7 @@ export class BLService {
     constructor(service) {
 	BLService.scanInfo = { service: '180d',
 			       heartrate: '2a37',
-			       timeout: 25 };
+			       timeout: 3 };
 	BLService.service = service;
     }
 
@@ -18,57 +18,54 @@ export class BLService {
 	document.addEventListener('deviceready', this.checkBluetooth(), false);
     }
 
-    checkBluetooth() {
-	BLE.isEnabled().then(
-            /* Bluetooth is on already */
-            function() {
-                BLService.startScan();
-            },
-            /* Bluetooth is not on already */
-            function() {
-		BLE.enable().then(
-                    /* Bluetooth was successfully turned on */
-                    function() {
-                        BLService.startScan();
-                    },
-                    /* Could not turn Bluetooth on */
-                    function() {
-                        alert("Bluetooth could not be enabled");
-                    }
-                );
-            }
-        );
+    isEnabled() {
+	return BLE.isEnabled();
     }
 
-    static startScan() {
-	/* Var used for timing out */
-        let foundDevice = false;
+    enable() {
+	return BLE.enable();
+    }
 
-        /* Subscribe to the scan using heart rate service. If a device is found, pass it and the subscription along */
-        var subscription = BLE.scan([BLService.scanInfo.service], BLService.scanInfo.timeout).subscribe(device => {
-	    scanSuccess(device);
-        });
+    startScan() {
+	/* Var used for timing out */
+        //let foundDevice = false;
+
+        /* Subscribe to the scan using heart rate service. If a device is found, pass it and the */
+        return [BLService.scanInfo.timeout, BLE.startScan([])];
+
+    }
+    
+    stopScan() {
+	BLE.stopScan().then(() => {});
+    }
+
+
+    timeout() {
 
         /* If no device is found, that sucks. Update */
         setTimeout(function() {
-            if (!foundDevice) {
-                alert("No device found");
-            }
+            BLE.stopScan().then(() => {});
         }, (BLService.scanInfo.timeout * 1000));
 
-	/* Success function for scan.  Notify the user of the device                                                                 
+	/* Success function for scan. Notify the user of the device            
            and unsubscribe from new devices. Then connect to device. */
         function scanSuccess(peripheral) {
             foundDevice = true;
-            Vibration.vibrate(100);
-            subscription.unsubscribe();
-            alert("Device Found: " + peripheral.name);
-            var connectSub = BLE.connect(peripheral.id).subscribe(result => {
-                /* Update device information and connect */
-                BLService.peripheral = peripheral;
-                BLService.connected(peripheral);
-            });
+	    Vibration.vibrate(100);
+	    subscription.unsubscribe();
+	    var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+		BLService.peripheral = peripheral;
+		BLService.connected(peripheral);
+	    });
         }
+    }
+
+    connect(peripheral) {
+	Vibration.vibrate(100);
+	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+	    BLService.peripheral = peripheral;
+            BLService.connected(peripheral);
+        });
     }
 
     static connected(peripheral) {
@@ -113,11 +110,9 @@ export class BLService {
     /* On page load, we want the status to reflect if the device is connected already */
     checkExistingBluetooth() {
 	if (BLService.peripheral) {
-            BLE.isConnected(BLService.peripheral.id).then(
-		function() {alert("Current connected to " + BLService.peripheral.name);},
-		function() {alert("Disconnected");}
-            );
+            return BLE.isConnected(BLService.peripheral.id);
 	}
+	else return BLE.isConnected(null);
     }
 
 }

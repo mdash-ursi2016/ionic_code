@@ -13,7 +13,7 @@
      Settings for Bluetooth.
   </p>
 
-  <button block dark (click)="init()">Scan and Connect</button>
+  <button block dark (click)="scan()">Scan and Connect</button>
   <button block stable (click)="disconnect()">Disconnect</button>
 
   <!-- Display the current status -->
@@ -22,11 +22,23 @@
   <div id="statusDiv">Disconnected</div>
   <br>
 
-  <p>---------------------</p>
+  
+  <ion-list>
+    <ion-item *ngFor="let item of listItems">
+      <p>{{item.rssi}}</p>
+      <p align="center"><b>{{item.name}}</b></p>
+      <button outline item-right (click)="connect(item)">Connect</button>
+    </ion-item>
+  </ion-list>
+
 
   <div id="content">Data will display here</div>
   <br>
-  
+ 
+
+
+
+ 
   <!-- Pop back to the previous page-->
   <div block button nav-pop> Back to Settings</div>
 
