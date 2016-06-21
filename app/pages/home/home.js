@@ -1,16 +1,14 @@
 import {Page, Storage, SqlStorage, Events} from 'ionic-angular';
 import {BLService} from '../blservice/blservice';
-import {StorageService} from '../storage/service';
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
     static get parameters() {
-	return [[StorageService],[BLService],[Events]];
+	return [[BLService],[Events]];
     }
-    constructor(service,bl,events) {
-	this.service = service; /* Storage */
+    constructor(bl,events) {
 	this.bl = bl; /* Bluetooth */
 	this.events = events; /* Subscriptions */
     }

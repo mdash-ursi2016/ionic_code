@@ -1,5 +1,5 @@
 import {BLE, Vibration} from 'ionic-native';
-import {StorageService} from '../storage/service';
+import {StorageService} from '../storage/storage';
 import {Injectable} from 'angular2/core';
 import {Events} from 'ionic-angular';
 
@@ -8,12 +8,12 @@ export class BLService {
     static get parameters() {
 	return [[StorageService],[Events]];
     }
-    constructor(service,events) {
+    constructor(storage,events) {
 	BLService.scanInfo = { service: '180d', /* Heart rate service */
 			       heartrate: '2a37', /* Heart rate characterstic */
 			       timeout: 3 }; /* Scan time in seconds */
 	/* The storage service */
-	BLService.service = service;
+	BLService.storage = storage;
 
 	/* Used for publishing */
 	BLService.events = events;
@@ -53,7 +53,7 @@ export class BLService {
 	BLService.subscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
 	BLService.subscription.subscribe(buffer => {
             var data = new Uint8Array(buffer);
-            BLService.service.store(data[1]);
+            BLService.storage.store(data[1]);
 
 	    /* Publish just the data to a new subscribable object for the live data feed
 	       Necessary because publisher:subscriber is not one to many */
