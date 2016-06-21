@@ -1,18 +1,18 @@
-import {BluetoothPage} from '../bluetooth/bluetooth';
-import {Page, Storage, SqlStorage} from 'ionic-angular';
-import {BLE} from 'ionic-native';
+import {Page, Storage, SqlStorage, Events} from 'ionic-angular';
+import {BLService} from '../blservice/blservice';
 import {StorageService} from '../storage/service';
-
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
     static get parameters() {
-	return [[StorageService]];
+	return [[StorageService],[BLService],[Events]];
     }
-    constructor(service) {
-	this.service = service;
+    constructor(service,bl,events) {
+	this.service = service; /* Storage */
+	this.bl = bl; /* Bluetooth */
+	this.events = events; /* Subscriptions */
     }
 
     onPageLoaded() {
@@ -40,41 +40,35 @@ export class HomePage {
 	HomePage.i = 0;
 
 	/* If we have a device to connect to, start up the data relay */
-	if (BluetoothPage.peripheral.id != null) HomePage.connect();
+	this.connect();
+	
     }
 
-    make() {
-	this.service.makeTable();
-    }
-
-    store() {
-	this.service.store(Math.floor(Math.random() * 100) + 1);
-    }
-    
-
-
-    static connect() {
-	/* Subscribe to incoming data packets */
-	var connectSub = BLE.startNotification(BluetoothPage.peripheral.id, '180d', '2a37').subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
-	    
+    connect() {
+	/* Subscribe to incoming data packets
+	   First make sure the subscription exists */
+	var connectSub = this.bl.getSubscription();
+	if (!connectSub) return;
+	
+	/* Subscribe to incoming data provided by BLService */
+	this.events.subscribe('bpm', (data) => {
 	    /* Update the HTML for the latest packet */
-	    content.innerHTML = "Your heart rate is currently <b>" + data[1] +  "</b> BPM";
+	    content.innerHTML = "Your heart rate is currently <b>" + data +  "</b> BPM";
 	    
 	    /* Increment the canvas (x-axis) index */
 	    HomePage.i += 2;
 	    
 	    /* Populate the array before overwriting anything in it */
 	    if (HomePage.points.length < 50) {
-		HomePage.ctx.lineTo(HomePage.i, data[1]);
-		HomePage.points.push([HomePage.i,data[1]]);
+		HomePage.ctx.lineTo(HomePage.i, data);
+		HomePage.points.push([HomePage.i,data]);
 	    }
 	    
 	    /* After it's populated, start the erasing algorithm */
 	    else {
 		
 		/* Draw to the next point */
-		HomePage.ctx.lineTo(HomePage.i, data[1]);
+		HomePage.ctx.lineTo(HomePage.i, data);
 
 		/* Move to the tail */
 		HomePage.ctx.moveTo(HomePage.points[HomePage.head][0], HomePage.points[HomePage.head][1]);
@@ -88,7 +82,7 @@ export class HomePage {
 
 		
 		/* Overwrite least recently used data point */
-		HomePage.points[HomePage.head] = [HomePage.i, data[1]];
+		HomePage.points[HomePage.head] = [HomePage.i, data];
 
 		/* Increment head and tail */
 		HomePage.head++;

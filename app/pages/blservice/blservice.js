@@ -1,65 +1,45 @@
 import {BLE, Vibration} from 'ionic-native';
 import {StorageService} from '../storage/service';
 import {Injectable} from 'angular2/core';
+import {Events} from 'ionic-angular';
 
 @Injectable()
 export class BLService {
     static get parameters() {
-	return [[StorageService]];
+	return [[StorageService],[Events]];
     }
-    constructor(service) {
-	BLService.scanInfo = { service: '180d',
-			       heartrate: '2a37',
-			       timeout: 3 };
+    constructor(service,events) {
+	BLService.scanInfo = { service: '180d', /* Heart rate service */
+			       heartrate: '2a37', /* Heart rate characterstic */
+			       timeout: 3 }; /* Scan time in seconds */
+	/* The storage service */
 	BLService.service = service;
+
+	/* Used for publishing */
+	BLService.events = events;
     }
 
-    scan() {
-	document.addEventListener('deviceready', this.checkBluetooth(), false);
-    }
-
+    /* Return a Promise for if Bluetooth is enabled or not */
     isEnabled() {
 	return BLE.isEnabled();
     }
 
+    /* Return a Promise for if Bluetooth was enabled or not */
     enable() {
 	return BLE.enable();
     }
 
+    /* Return a pair including the scan timeout and the scan subscription */
     startScan() {
-	/* Var used for timing out */
-        //let foundDevice = false;
-
-        /* Subscribe to the scan using heart rate service. If a device is found, pass it and the */
         return [BLService.scanInfo.timeout, BLE.startScan([])];
-
     }
     
+    /* Stop scanning */
     stopScan() {
 	BLE.stopScan().then(() => {});
     }
 
-
-    timeout() {
-
-        /* If no device is found, that sucks. Update */
-        setTimeout(function() {
-            BLE.stopScan().then(() => {});
-        }, (BLService.scanInfo.timeout * 1000));
-
-	/* Success function for scan. Notify the user of the device            
-           and unsubscribe from new devices. Then connect to device. */
-        function scanSuccess(peripheral) {
-            foundDevice = true;
-	    Vibration.vibrate(100);
-	    subscription.unsubscribe();
-	    var connectSub = BLE.connect(peripheral.id).subscribe(result => {
-		BLService.peripheral = peripheral;
-		BLService.connected(peripheral);
-	    });
-        }
-    }
-
+    /* Connect to the given device, and set the peripheral for later */
     connect(peripheral) {
 	Vibration.vibrate(100);
 	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
@@ -68,12 +48,16 @@ export class BLService {
         });
     }
 
+    /* Record incoming data in storage */
     static connected(peripheral) {
-	BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate).subscribe(buffer => {
+	BLService.subscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
+	BLService.subscription.subscribe(buffer => {
             var data = new Uint8Array(buffer);
-            //alert(data[1]);
-	    //content.innerHTML = data[1];
             BLService.service.store(data[1]);
+
+	    /* Publish just the data to a new subscribable object for the live data feed
+	       Necessary because publisher:subscriber is not one to many */
+	    BLService.events.publish('bpm',data[1]);
         });
     }
 
@@ -112,7 +96,12 @@ export class BLService {
 	if (BLService.peripheral) {
             return BLE.isConnected(BLService.peripheral.id);
 	}
+	/* Should always be a rejected Promise */
 	else return BLE.isConnected(null);
+    }
+
+    getSubscription() {
+	return BLService.subscription;
     }
 
 }
