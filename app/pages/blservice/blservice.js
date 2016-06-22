@@ -10,7 +10,7 @@ export class BLService {
     }
     constructor(storage,events) {
 	BLService.scanInfo = { service: '180d', /* Heart rate service */
-			       heartrate: '2a37', /* Heart rate characterstic */
+			       heartrate: '2a37', /* Heart rate characteristic */
 			       timeout: 3 }; /* Scan time in seconds */
 	/* The storage service */
 	BLService.storage = storage;
@@ -53,9 +53,9 @@ export class BLService {
 	BLService.subscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
 	BLService.subscription.subscribe(buffer => {
             var data = new Uint8Array(buffer);
-            BLService.storage.store(data[1]);
+            //BLService.storage.store(data[1]);
 
-	    /* Publish just the data to a new subscribable object for the live data feed
+	    /* Publish just the data to a new subscriptable object for the live data feed
 	       Necessary because publisher:subscriber is not one to many */
 	    BLService.events.publish('bpm',data[1]);
         });

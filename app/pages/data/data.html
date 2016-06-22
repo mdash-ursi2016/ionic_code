@@ -14,10 +14,19 @@
      This is  where all the long term visualization would go.
   </p>
 
-  <button (click)="make()">Make Table</button>
   <button (click)="store()">Store Random Data</button>
   <button (click)="retrieve()">Retrieve Data</button>
   <button (click)="clear()">Clear Data</button>
+
+  <ion-item>
+    <ion-label>Start Date</ion-label>
+    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="startDate"></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>End Date</ion-label>
+    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="endDate"></ion-datetime>
+  </ion-item>
   
   <br>
 

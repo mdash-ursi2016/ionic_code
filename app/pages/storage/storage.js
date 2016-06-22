@@ -9,23 +9,23 @@ export class StorageService {
 
     /* Create a new table, as long as one doesn't already exist, with datetime and integer columns */
     makeTable() {
-	this.storage.query('CREATE TABLE IF NOT EXISTS dataTable(ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP, value INTEGER)').then(
+	this.storage.query('CREATE TABLE IF NOT EXISTS dataTable(date DATETIME, value INTEGER)').then(
 	    function() {},
 	    function() {alert("Failed to create table");}
 	);
     }
 
     /* Store a value into the database with the current time automatically generated */
-    store(newVal) {
-	this.storage.query('INSERT INTO dataTable(value) VALUES(?)',[newVal]).then(
+    store(date,newVal) {
+	this.storage.query('INSERT INTO dataTable(date,value) VALUES(?,?)',[date,newVal]).then(
 	    function() {}, //{alert("Stored data: " + newVal);},
 	    function() {alert("Failed to store data");}
 	);
     }
     
     /* Retrieve all data points from the database, loop over them, and display the values */
-    retrieve() {
-	return this.storage.query('SELECT * FROM dataTable');
+    retrieve(date1,date2) {
+	return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
     }
 
     /* Delete the table */

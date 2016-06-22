@@ -1,16 +1,19 @@
 import {Page, Storage, SqlStorage, Events} from 'ionic-angular';
 import {BLService} from '../blservice/blservice';
+import {Http} from '../http/http';
+
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
     static get parameters() {
-	return [[BLService],[Events]];
+	return [[BLService],[Events],[Http]];
     }
-    constructor(bl,events) {
+    constructor(bl,events,http) {
 	this.bl = bl; /* Bluetooth */
 	this.events = events; /* Subscriptions */
+	this.http = http;
     }
 
     onPageLoaded() {
@@ -35,12 +38,17 @@ export class HomePage {
 	/* The first point is actually offscreen so a big jump doesn't get drawn */
 	HomePage.ctx.moveTo(-2,0);
 	HomePage.ctx.beginPath();
-	HomePage.i = 0;
+	HomePage.i = -2;
 
 	/* If we have a device to connect to, start up the data relay */
 	this.connect();
 	
     }
+
+    test() {
+	this.http.getToken();
+    }
+
 
     connect() {
 	/* Subscribe to incoming data packets
@@ -52,45 +60,50 @@ export class HomePage {
 	this.events.subscribe('bpm', (data) => {
 	    /* Update the HTML for the latest packet */
 	    content.innerHTML = "Your heart rate is currently <b>" + data +  "</b> BPM";
+
+	    /* Use the old method for drawing until newer is fixed */
+	    HomePage.draw(data);
+	    return;
+	    
 	    
 	    /* Increment the canvas (x-axis) index */
 	    HomePage.i += 2;
-	    
-	    /* Populate the array before overwriting anything in it */
+	    /* Populate the array before overwriting anything in it (and draw) */
 	    if (HomePage.points.length < 50) {
 		HomePage.ctx.lineTo(HomePage.i, data);
 		HomePage.points.push([HomePage.i,data]);
+		HomePage.ctx.stroke();
 	    }
 	    
 	    /* After it's populated, start the erasing algorithm */
 	    else {
 		
-		/* Draw to the next point */
+		/* Change the stroke color to green */
+		HomePage.ctx.strokeStyle = "#00FF00";
+		/* Draw to newest point */
 		HomePage.ctx.lineTo(HomePage.i, data);
-
-		/* Move to the tail */
+		/* Move to the tail of the line*/
 		HomePage.ctx.moveTo(HomePage.points[HomePage.head][0], HomePage.points[HomePage.head][1]);
-		
-		/* Change to black, erase last point, change to green, move back to tail */
+		HomePage.ctx.stroke();
+
+
+		/* Change to black */
 		HomePage.ctx.strokeStyle = "#000000";
+		/* Erase up to second to last point */
 		var tmp = (HomePage.head + 1) % 50;
 		HomePage.ctx.lineTo(HomePage.points[tmp][0], HomePage.points[tmp][1]);
-		HomePage.ctx.strokeStyle = "#00FF00";
-		HomePage.ctx.moveTo(HomePage.points[head][0], HomePage.points[HomePage.head][1]);
-
 		
-		/* Overwrite least recently used data point */
+		/* Update last point to newest point */
 		HomePage.points[HomePage.head] = [HomePage.i, data];
+		/* Move to newest point */
+		HomePage.ctx.moveTo(HomePage.points[HomePage.head][0], HomePage.points[HomePage.head][1]);
+		HomePage.ctx.stroke();
+		
 
-		/* Increment head and tail */
+		/* Increment head */
 		HomePage.head++;
 		HomePage.head %= 50;
 	    }
-	    
-	    HomePage.ctx.stroke();
-
-	    /* Draw the most recent point */
-	    //HomePage.draw(data[1]);
 	});
     }
 
@@ -100,13 +113,12 @@ export class HomePage {
     static draw(point) {
 	/* Increment by 2 for more noticeable drawing changes */
 	HomePage.i += 2;
-	HomePage.ctx.lineTo(HomePage.i, (HomePage.c.height - point));
+	HomePage.ctx.lineTo(HomePage.i, (HomePage.c.height - (2 * point)));
 	HomePage.ctx.stroke();
 	
 	/* If the index (x-axis) is out of bounds, reset canvas */
 	if (HomePage.i > HomePage.c.width)
 	    {
-		//HomePage.ctx.clearRect(0,0,HomePage.c.width,HomePage.c.height);
 		HomePage.ctx.fillRect(0,0,HomePage.c.width,HomePage.c.height);
 		HomePage.ctx.beginPath();
 

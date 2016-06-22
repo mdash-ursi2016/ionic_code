@@ -1,6 +1,6 @@
 import {Page, NavController, Toast} from 'ionic-angular';
 import {Chart} from 'chart.js';
-import {StorageService} from '../storage/service';
+import {StorageService} from '../storage/storage';
 
 @Page({
   templateUrl: 'build/pages/data/data.html'
@@ -25,21 +25,26 @@ export class DataPage {
 	DataPage.db = [];
 	DataPage.makeChart();
     }
-
-    make() {
-	this.service.makeTable();
-    }
     
     store() {
-	this.service.store(Math.floor(Math.random() * 100) + 1);
+	/* Store the current date and a random number 1-100 */
+	this.service.store(new Date(),Math.floor(Math.random() * 100) + 1);
     }
-
 
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
+	/* Get the dates from the Datetime Ionic component and create a Date() object */
+	let s1 = this.strParse(this.startDate);
+	let s2 = this.strParse(this.endDate);
 
+	/* The parse function separates ISO 8601 times into individual components */
+	let d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]);
+	let d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]);
+
+	/* Get all the data from the database and graph it */
 	let j = 0;
-	this.service.retrieve().then(
+	DataPage.labels = [];
+	this.service.retrieve(d1,d2).then(
 	    function(value) {
 		/* A data object is returned, iterate through it */
 		for (var i = 0; i < value.res.rows.length; i++) {
@@ -114,7 +119,27 @@ export class DataPage {
 		    borderWidth: 1
 		}]
 	    },
+	    options: {
+		scales: {
+		    xAxes: [{
+			ticks: {
+			    maxTicksLimit: 20
+			}
+		    }]
+		}
+	    }
 	});
+    }
+
+
+    strParse(str) {
+	return [
+	    parseInt(str.slice(0,4)), /* Year */
+	    parseInt(str.slice(5,7)) - 1, /* Month */
+	    parseInt(str.slice(8,10)), /* Day */
+	    parseInt(str.slice(11,13)), /* Hour */
+	    parseInt(str.slice(14,16)) /* Minute */
+	];
     }
 
 }
