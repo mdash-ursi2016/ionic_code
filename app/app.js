@@ -7,11 +7,12 @@ import {AboutPage} from './pages/about/about';
 import {DataPage} from './pages/data/data';
 import {StorageService} from './pages/storage/storage';
 import {BLService} from './pages/blservice/blservice';
-import {Http} from './pages/http/http';
+import {HttpService} from './pages/httpservice/httpservice';
+
 
 @App({
   templateUrl: 'build/app.html',
-  providers: [StorageService, BLService, Http],
+  providers: [StorageService, BLService, HttpService],
   config: {}, // http://ionicframework.com/docs/v2/api/config/Config/
   queries: {
     nav: new ViewChild('content')

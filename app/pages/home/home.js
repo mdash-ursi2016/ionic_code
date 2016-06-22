@@ -1,19 +1,18 @@
 import {Page, Storage, SqlStorage, Events} from 'ionic-angular';
 import {BLService} from '../blservice/blservice';
-import {Http} from '../http/http';
-
+import {HttpService} from '../httpservice/httpservice';
 
 @Page({
   templateUrl: 'build/pages/home/home.html'
 })
 export class HomePage {
     static get parameters() {
-	return [[BLService],[Events],[Http]];
+	return [[BLService],[Events],[HttpService]];
     }
-    constructor(bl,events,http) {
+    constructor(bl,events,httpservice) {
 	this.bl = bl; /* Bluetooth */
 	this.events = events; /* Subscriptions */
-	this.http = http;
+	this.httpservice = httpservice;
     }
 
     onPageLoaded() {
@@ -46,7 +45,14 @@ export class HomePage {
     }
 
     test() {
-	this.http.getToken();
+	this.httpservice.makeGetRequest();
+	return;
+
+	this.httpservice.getToken().then((success) => {
+	    alert(success);
+	}, (error) => {
+	    alert(error);
+	});
     }
 
 

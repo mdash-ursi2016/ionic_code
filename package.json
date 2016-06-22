@@ -39,7 +39,8 @@
     "cordova-plugin-geolocation",
     "cordova-plugin-flashlight",
     "cordova-plugin-vibration",
-    "cordova-plugin-background-mode"
+    "cordova-plugin-background-mode",
+    "cordova-plugin-inappbrowser"
   ],
   "cordovaPlatforms": [
     "ios"
