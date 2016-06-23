@@ -2,7 +2,7 @@ import {ViewChild} from '@angular/core';
 import {App, Platform} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {HomePage} from './pages/home/home';
-import {SettingsPage} from './pages/settings/settings';
+import {BluetoothPage} from './pages/bluetooth/bluetooth';
 import {AboutPage} from './pages/about/about';
 import {DataPage} from './pages/data/data';
 import {StorageService} from './services/storageservice/storageservice';
@@ -31,8 +31,8 @@ class MyApp {
     // used for an example of ngFor and navigation
     this.pages = [
       { title: 'Home', component: HomePage },
-      { title: 'Data', component: DataPage },
-      { title: 'Settings', component: SettingsPage },
+      { title: 'Data Visualization', component: DataPage },
+      { title: 'Bluetooth Settings', component: BluetoothPage },
       { title: 'About', component: AboutPage }
     ];
 

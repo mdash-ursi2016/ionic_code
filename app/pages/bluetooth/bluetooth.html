@@ -14,7 +14,7 @@
   </p>
 
   <button block dark (click)="scan()">Scan for Devices</button>
-  <button id="dc" block stable (click)="disconnect()">Disconnect</button>
+  <button id="dc" block stable (click)="disconnect()">Disconnect from Device</button>
 
   <!-- Display the current status -->
   
@@ -30,17 +30,6 @@
       <button outline item-right (click)="connect(item)">Connect</button>
     </ion-item>
   </ion-list>
-
-
-  <div id="content">Data will display here</div>
-  <br>
- 
-
-
-
- 
-  <!-- Pop back to the previous page-->
-  <div block button nav-pop> Back to Settings</div>
 
 
 </ion-content>
