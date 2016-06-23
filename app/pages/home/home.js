@@ -1,6 +1,6 @@
 import {Page, Storage, SqlStorage, Events} from 'ionic-angular';
-import {BLService} from '../blservice/blservice';
-import {HttpService} from '../httpservice/httpservice';
+import {BLService} from '../../services/blservice/blservice';
+import {HttpService} from '../../services/httpservice/httpservice';
 
 @Page({
   templateUrl: 'build/pages/home/home.html'

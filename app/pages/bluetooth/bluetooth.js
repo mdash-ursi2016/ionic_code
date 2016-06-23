@@ -1,5 +1,5 @@
 import {Page, Alert, NavController, Loading} from 'ionic-angular';
-import {BLService} from '../blservice/blservice';
+import {BLService} from '../../services/blservice/blservice';
 
 @Page({
   templateUrl: 'build/pages/bluetooth/bluetooth.html'

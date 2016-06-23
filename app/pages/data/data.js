@@ -1,6 +1,6 @@
 import {Page, NavController, Toast} from 'ionic-angular';
 import {Chart} from 'chart.js';
-import {StorageService} from '../storage/storage';
+import {StorageService} from '../../services/storageservice/storageservice';
 
 @Page({
   templateUrl: 'build/pages/data/data.html'

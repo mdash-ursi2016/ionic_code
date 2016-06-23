@@ -5,9 +5,9 @@ import {HomePage} from './pages/home/home';
 import {SettingsPage} from './pages/settings/settings';
 import {AboutPage} from './pages/about/about';
 import {DataPage} from './pages/data/data';
-import {StorageService} from './pages/storage/storage';
-import {BLService} from './pages/blservice/blservice';
-import {HttpService} from './pages/httpservice/httpservice';
+import {StorageService} from './services/storageservice/storageservice';
+import {BLService} from './services/blservice/blservice';
+import {HttpService} from './services/httpservice/httpservice';
 
 
 @App({
