@@ -45,7 +45,7 @@ export class HomePage {
     }
 
     test() {
-	this.httpservice.makeGetRequest();
+	this.httpservice.makePostRequest();
 	return;
 
 	this.httpservice.getToken().then((success) => {

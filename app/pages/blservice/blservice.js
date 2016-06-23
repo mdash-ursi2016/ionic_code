@@ -1,6 +1,6 @@
 import {BLE, Vibration} from 'ionic-native';
 import {StorageService} from '../storage/storage';
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 import {Events} from 'ionic-angular';
 
 @Injectable()
