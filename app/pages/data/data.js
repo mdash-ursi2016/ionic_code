@@ -1,6 +1,7 @@
 import {Page, NavController, Toast} from 'ionic-angular';
 import {Chart} from 'chart.js';
 import {StorageService} from '../../services/storageservice/storageservice';
+import {HttpService} from '../../services/httpservice/httpservice';
 
 @Page({
   templateUrl: 'build/pages/data/data.html'
@@ -8,14 +9,18 @@ import {StorageService} from '../../services/storageservice/storageservice';
 export class DataPage {
     static get parameters() {
 	/* Used for Loading and Storage*/
-	return [[NavController], [StorageService]];
+	return [[NavController], [StorageService], [HttpService]];
     }
 
-    constructor(nav,service) {
+    constructor(nav,storage, httpservice) {
 	/* Used for Loading */
 	this.nav = nav;
 	/* Used for storage */
-	this.service = service;
+	this.storage = storage;
+	/* Used for token/http requests */
+	this.httpservice = httpservice;
+	this.startDate = "";
+	this.endDate = "";
     }
 
   /* Draw an empty graph when the page is first loaded */
@@ -26,9 +31,19 @@ export class DataPage {
 	DataPage.makeChart();
     }
     
+    getToken() {
+	this.httpservice.getToken().then((success) => {
+	    alert(success);
+	}, (error) => {
+	    alert(error);
+	});
+    }
+
+
+
     store() {
 	/* Store the current date and a random number 1-100 */
-	this.service.store(new Date(),Math.floor(Math.random() * 100) + 1);
+	this.storage.store(new Date(),Math.floor(Math.random() * 100) + 1);
     }
 
     /* Retrieve a fixed amount of data from storage and show the graph */
@@ -44,7 +59,7 @@ export class DataPage {
 	/* Get all the data from the database and graph it */
 	let j = 0;
 	DataPage.labels = [];
-	this.service.retrieve(d1,d2).then(
+	this.storage.retrieve(d1,d2).then(
 	    function(value) {
 		/* A data object is returned, iterate through it */
 		for (var i = 0; i < value.res.rows.length; i++) {
@@ -71,8 +86,8 @@ export class DataPage {
        This function should eventually be hidden in settings */
     clear() {
 	/* Delete the table and make a new one */
-	this.service.clear();
-	this.service.makeTable();
+	this.storage.clear();
+	this.storage.makeTable();
 	
 	/* Notify the event with a Toast */
 	let toast = Toast.create({

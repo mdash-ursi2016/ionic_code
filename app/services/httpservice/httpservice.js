@@ -15,13 +15,13 @@ export class HttpService {
     getToken() {
 	return new Promise(function(resolve, reject) {
 	    /* Open the URL in app without header information (URL, back/forward buttons, etc.) */
-	    var browserRef = InAppBrowser.open("http://143.229.6.40:8082/oauth/authorize?response_type=token&client_id=testClient&redirect_uri=http://143.229.6.40:8082/&scope=read_data_points", "_blank","location=no");
+	    var browserRef = InAppBrowser.open("http://143.229.6.40:80/oauth/authorize?response_type=token&client_id=testClient&redirect_uri=http://143.229.6.40:80/&scope=read_data_points", "_blank","location=no");
 	    
 	    /* When the browser reloads, check the URL */
 	    browserRef.addEventListener("loadstart", (event) => {
 		
 		/* If the URL starts this way, we can access the token */
-		if ((event.url).indexOf("143.229.6.40:8082/#") === 0) {
+		if ((event.url).indexOf("http://143.229.6.40/#") === 0) {
 		    browserRef.removeEventListener("exit", (event) => {});
 		    browserRef.close();
 

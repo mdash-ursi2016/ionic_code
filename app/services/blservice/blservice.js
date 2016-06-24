@@ -9,8 +9,11 @@ export class BLService {
 	return [[StorageService],[Events]];
     }
     constructor(storage,events) {
-	BLService.scanInfo = { service: '180d', /* Heart rate service */
-			       heartrate: '2a37', /* Heart rate characteristic */
+	BLService.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
+			       heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
+			       ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
+	    //service: '180d',
+	    //heartrate: '2a37',
 			       timeout: 3 }; /* Scan time in seconds */
 	/* The storage service */
 	BLService.storage = storage;
@@ -31,7 +34,7 @@ export class BLService {
 
     /* Return a pair including the scan timeout and the scan subscription */
     startScan() {
-        return [BLService.scanInfo.timeout, BLE.startScan([])];
+        return [BLService.scanInfo.timeout, BLE.startScan([BLService.scanInfo.service])];
     }
     
     /* Stop scanning */
@@ -50,15 +53,29 @@ export class BLService {
 
     /* Record incoming data in storage */
     static connected(peripheral) {
-	BLService.subscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
-	BLService.subscription.subscribe(buffer => {
-            var data = new Uint8Array(buffer);
-            //BLService.storage.store(data[1]);
+	/* Subscription for the heart rate (BPM) */
+	BLService.HRsubscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
+	/* Subscription for the EKG data */
+	BLService.EKGsubscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.ekg);
 
-	    /* Publish just the data to a new subscriptable object for the live data feed
-	       Necessary because publisher:subscriber is not one to many */
-	    BLService.events.publish('bpm',data[1]);
+	/* Subscribe to the BPM */
+	BLService.HRsubscription.subscribe(buffer => {
+	    var data = new Uint8Array(buffer);
+            BLService.storage.store(new Date(),data);
+	    console.log("BPM: " + data);
+	    
+	    /* Republish the data for the home page */
+	    BLService.events.publish('bpm',parseInt(data));
         });
+
+	/* Subscribe to the EKG */
+	BLService.EKGsubscription.subscribe(buffer => {
+	    var data = new Uint8Array(buffer);
+	    console.log("EKG: " + data.toString());
+	    
+	    /* Republish the data for the home page */
+	    BLService.events.publish('ekg',data);
+	});
     }
 
 
@@ -101,7 +118,7 @@ export class BLService {
     }
 
     getSubscription() {
-	return BLService.subscription;
+	return BLService.HRsubscription;
     }
 
 }
