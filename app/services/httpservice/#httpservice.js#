@@ -9,7 +9,7 @@ export class HttpService {
     }
     constructor(http) {
 	this.http = http;
-/*
+
 	let json_flat = 
 	    {
 		"header":{
@@ -37,7 +37,7 @@ export class HttpService {
 	    };
 
 	this.bpm_json = json_flat;
-*/
+
     }
 
     
@@ -91,15 +91,15 @@ export class HttpService {
 
 
     /* Make a post request to a server */
-    /*
+    
     makePostRequest(value,token) {
 	//this.createJSON(value);
 	//console.log(JSON.stringify(this.bpm_json));
 	
 	//console.log(token);
 	var authHeaders = new Headers();
-	authHeaders.append('Authorization', 'Bearer e9add5f7-9aa0-4470-8909-0c9eb1fe1547');
-	authHeaders.append('Content-Type', 'text/plain');
+	authHeaders.append('Authorization', 'Bearer ' + token);
+	authHeaders.append('Content-Type', 'application/json');
 
 	//console.log(JSON.stringify(headers));
 
@@ -115,7 +115,7 @@ export class HttpService {
 			  () => console.log("Completed")
 		      );
     }
-*/
+
 
     createJSON(value) {
 

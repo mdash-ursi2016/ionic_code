@@ -2,13 +2,14 @@ import {BLE, Vibration} from 'ionic-native';
 import {StorageService} from '../storageservice/storageservice';
 import {Injectable} from '@angular/core';
 import {Events} from 'ionic-angular';
+import {HttpService} from '../httpservice/httpservice';
 
 @Injectable()
 export class BLService {
     static get parameters() {
-	return [[StorageService],[Events]];
+	return [[StorageService],[Events],[HttpService]];
     }
-    constructor(storage,events) {
+    constructor(storage,events,httpservice) {
 	BLService.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
 			       heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
 			       ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
@@ -20,6 +21,8 @@ export class BLService {
 
 	/* Used for publishing */
 	BLService.events = events;
+
+	BLService.httpservice = httpservice;
     }
 
     /* Return a Promise for if Bluetooth is enabled or not */
@@ -62,8 +65,10 @@ export class BLService {
 	BLService.HRsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
             BLService.storage.store(new Date(),data);
-	    console.log("BPM: " + data);
+	    //console.log("BPM: " + data);
 	    
+//	    BLService.httpservice.makePostRequest(parseInt(data));
+
 	    /* Republish the data for the home page */
 	    BLService.events.publish('bpm',parseInt(data));
         });
@@ -71,7 +76,7 @@ export class BLService {
 	/* Subscribe to the EKG */
 	BLService.EKGsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
-	    console.log("EKG: " + data.toString());
+	    //console.log("EKG: " + data.toString());
 	    
 	    /* Republish the data for the home page */
 	    BLService.events.publish('ekg',data);

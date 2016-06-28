@@ -18,8 +18,8 @@ export class HomePage {
     }
 
     onPageDidEnter() {
-	this.points = [];
-	this.head = 0;
+	var points = [];
+	var head = 0;
 
 	/* Retrieve information about the canvas and its context */
 	this.c = document.getElementById("myCanvas");
@@ -57,12 +57,10 @@ export class HomePage {
 	/* Graph EKG data provided by BLService */
 	this.events.subscribe('ekg', (data) => {
 	    /* The data is a single element array containing an array of numbers */
-	    for (var i = 0; i < data[0].length; i++) {
-		this.draw(data[0][i]);
+	    for (var j = 0; j < data[0].length; j++) {
+		this.draw(data[0][j]);
 	    }
 
-	    /* Using old draw method for now */
-	    return;
 	});
     }
 
@@ -109,19 +107,20 @@ export class HomePage {
 	}
     }
 
-    /* Old graphing method for a single, unerasing line until the end of the canvas
+    /* Old graphing method for a single, unerasing line until the end of the canvas.
        Given a point, draw it on the canvas and erase if the canvas is full */
     draw(point) {
 	/* Increment by 2 for more noticeable drawing changes */
 	this.i += 1;
+	console.log(this.i);
 	this.ctx.strokeStyle = "#00FF00";
-	this.ctx.lineTo(this.i, (this.c.height - (2 * point)));;
+	this.ctx.lineTo(this.i, (this.c.height - (2 * point)));
 	this.ctx.stroke();
 	
 	/* If the index (x-axis) is out of bounds, reset canvas */
 	if (this.i > this.c.width)
 	    {
-		this.ctx.clearRect(0,0,this.c.width, this.c.height);
+		this.ctx.clearRect(0,0, this.c.width, this.c.height);
 		this.ctx.beginPath();
 
 		this.ctx.moveTo(-2, this.c.height - point);
