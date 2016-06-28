@@ -31,16 +31,13 @@ export class DataPage {
 	DataPage.makeChart();
     }
     
+    /* Retrieve authorization token from server */
     getToken() {
 	this.httpservice.getToken().then((success) => {
-	    console.log(success);
-	    this.httpservice.makeGetRequest(success); },
-					 (fail) => { console.log("Fail"); }
-					);
-	    //this.httpservice.makePostRequest(75,success);
-	//}, (error) => {
-	  //  alert(error);
-	//});
+	    alert("Retrieved token is: " + success);
+	}, (error) => {
+	    alert(JSON.stringify(error));
+	});
     }
 
 

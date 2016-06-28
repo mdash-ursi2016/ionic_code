@@ -9,8 +9,9 @@ export class HttpService {
     }
     constructor(http) {
 	this.http = http;
-/*
-	let json_flat = 
+
+	/* The format of a post to the server */
+	this.bpm_json = 
 	    {
 		"header":{
 		    "id":"0",
@@ -36,8 +37,6 @@ export class HttpService {
 		}
 	    };
 
-	this.bpm_json = json_flat;
-*/
     }
 
     
@@ -46,6 +45,7 @@ export class HttpService {
     /* Opens a browser, allows user to login, return with access token */
     getToken() {
 	return new Promise(function(resolve, reject) {
+
 	    /* Open the URL in app without header information (URL, back/forward buttons, etc.) */
 	    var browserRef = InAppBrowser.open("http://143.229.6.40:80/oauth/authorize?response_type=token&client_id=vassarOMH&redirect_uri=http://143.229.6.40:80/&scope=write_data_points%20read_data_points", "_blank","location=no");
 	    
@@ -60,8 +60,11 @@ export class HttpService {
 		    /* Token is located between "=" and "&" */
 		    let token = (event.url).split("=")[1].split("&")[0];
 
-		    if (token !== null)
+		    if (token !== null) {
+			/* Set the token for post requests */
+			HttpService.token = token;
 			resolve (token);
+		    }
 		    else
 			reject ("Yeah, that didn't work bud");
 		}
@@ -70,57 +73,49 @@ export class HttpService {
     }
     
 
-    /* Make a get request from a server */
-    makeGetRequest(token) {
+    /* Make a get request from the server */
+    makeGetRequest() {
 	
+	/* Create headers (includes token) */
 	var authHeaders = new Headers();
-	//{
-	//    "Authorization": "Bearer e9add5f7-9aa0-4470-8909-0c9eb1fe1547",
-	//    "Accept": "application/json"
-	//});
-	authHeaders.append('Authorization', 'Bearer ' + token);
+	authHeaders.append('Authorization', 'Bearer ' + HttpService.token);
 	authHeaders.append('Accept', 'application/json');
 
-	console.log(JSON.stringify(authHeaders));
-
-	this.http.get("http://143.229.6.40:443/v1.0.M1/dataPoints/newHR",
-		      { headers: authHeaders }).subscribe(data => { alert(JSON.stringify(data)) },
-							  error => { alert("No") }
-							 );
-    }
-
-
-    /* Make a post request to a server */
-    /*
-    makePostRequest(value,token) {
-	//this.createJSON(value);
-	//console.log(JSON.stringify(this.bpm_json));
-	
-	//console.log(token);
-	var authHeaders = new Headers();
-	authHeaders.append('Authorization', 'Bearer e9add5f7-9aa0-4470-8909-0c9eb1fe1547');
-	authHeaders.append('Content-Type', 'text/plain');
-
-	//console.log(JSON.stringify(headers));
-
-
-	//alert(typeof JSON.stringify(this.bpm_json));
-	this.http.post("http://143.229.6.40:443/v1.0.M1/test",
-		       "BLAH",
-		       //JSON.stringify(this.bpm_json),
-		       //"hello",
-		      { headers:authHeaders }).subscribe(
-			  data => alert(data),
-			  error => console.log(JSON.stringify(error)),
-			  () => console.log("Completed")
+	/* Request the data */
+	this.http.get("http://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schema_name=heart-rate&schema_version=1.0",
+		      { headers: authHeaders }).subscribe(
+			  data => console.log("Success"),
+			  error => alert("No")
 		      );
     }
-*/
 
+
+    /* Make a post request to the server */
+    makePostRequest(value) {
+
+	/* Edit the JSON to post into the correct format*/
+	this.createJSON(value);
+	
+	/* Create headers (includes token) */
+	var authHeaders = new Headers();
+	authHeaders.append('Authorization', 'Bearer ' + HttpService.token);
+	authHeaders.append('Content-Type', 'application/json');
+
+	/* Post the data */
+	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints",
+		       JSON.stringify(this.bpm_json),
+		      { headers:authHeaders }).subscribe(
+			  data => console.log(JSON.stringify(data)),
+			  error => alert("Post error. Is your token valid?")
+		      );
+    }
+
+    /* Change the JSON template with desired information.
+       Correct dates not implemented yet */
     createJSON(value) {
 
 	this.bpm_json.header.creation_date_time = new Date().toISOString();
-
+	this.bpm_json.header.id = ((new Date).getTime()).toString();
 	this.bpm_json.body.heart_rate.value = value;
 	this.bpm_json.body.effective_time_frame.date_time = new Date().toISOString();
     }

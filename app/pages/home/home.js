@@ -38,6 +38,9 @@ export class HomePage {
 	this.platform.ready().then(() => {
 	    this.connect();
 	});
+
+	/* Set the HTML element for usage if the page is left and re-entered */
+	this.content = content;
 	
     }
 
@@ -50,7 +53,7 @@ export class HomePage {
 	
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
-	    content.innerHTML = data;
+	    this.content.innerHTML = data;
 	});
 	
 
@@ -112,7 +115,7 @@ export class HomePage {
     draw(point) {
 	/* Increment by 2 for more noticeable drawing changes */
 	this.i += 1;
-	console.log(this.i);
+	//console.log(this.i);
 	this.ctx.strokeStyle = "#00FF00";
 	this.ctx.lineTo(this.i, (this.c.height - (2 * point)));
 	this.ctx.stroke();
