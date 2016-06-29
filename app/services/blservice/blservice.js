@@ -63,6 +63,7 @@ export class BLService {
 	/* Subscribe to the BPM */
 	BLService.HRsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
+	    data = data[0];
 	    /* Store data */
             BLService.storage.store(new Date(),data);
 	    /* Post the data to the server */

@@ -34,12 +34,18 @@ export class DataPage {
     /* Retrieve authorization token from server */
     getToken() {
 	this.httpservice.getToken().then((success) => {
-	    alert("Retrieved token is: " + success);
+	    this.storage.storeToken(success);
+	    let toast = Toast.create({
+		message: success,
+		duration: 2000,
+		position: 'bottom',
+		showCloseButton: true
+	    });
+	    this.nav.present(toast);
 	}, (error) => {
 	    alert(JSON.stringify(error));
 	});
     }
-
 
 
     store() {
@@ -94,7 +100,8 @@ export class DataPage {
 	let toast = Toast.create({
             message: 'Table Cleared',
             duration: 2000,
-            position: 'bottom'
+            position: 'bottom',
+	    showCloseButton: true
         });
         this.nav.present(toast);
 

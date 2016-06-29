@@ -36,6 +36,14 @@ export class StorageService {
 	    function() {alert("Failed to delete table");}
 	);
     }
-    
 
+    /* Save the token */
+    storeToken(token) {
+	this.storage.set('token',token);
+    }
+
+    /* Retrieve the token */
+    retrieveToken() {
+	return this.storage.get('token');
+    }
 }

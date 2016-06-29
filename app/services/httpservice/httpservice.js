@@ -1,14 +1,16 @@
 import {InAppBrowser} from 'ionic-native';
 import {Injectable} from '@angular/core';
 import {Http,Headers} from '@angular/http';
+import {StorageService} from '../../services/storageservice/storageservice';
 
 @Injectable()
 export class HttpService {
     static get parameters() {
-	return [[Http]];
+	return [[Http],[StorageService]];
     }
-    constructor(http) {
+    constructor(http,storage) {
 	this.http = http;
+	this.storage = storage;
 
 	/* The format of a post to the server */
 	this.bpm_json = 
@@ -62,7 +64,6 @@ export class HttpService {
 
 		    if (token !== null) {
 			/* Set the token for post requests */
-			HttpService.token = token;
 			resolve (token);
 		    }
 		    else
@@ -92,11 +93,29 @@ export class HttpService {
 
     /* Make a post request to the server */
     makePostRequest(value) {
+	
+	/* If the token isn't null, we can post immediately */
+	if (HttpService.token){
+	    this.post(value);
+	    return;
+	}
+
+	/* Otherwise, we have to retrieve the token */
+	this.storage.retrieveToken().then(
+	    (token) => {
+		HttpService.token = token;
+		this.post(value);
+	    }, function() {
+		alert("Token storage error");
+	    }
+	);
+    }
+    
+    /* Post helper function */
+    post(value) {
 
 	/* Edit the JSON to post into the correct format*/
 	this.createJSON(value);
-
-	//alert(HttpService.token);
 	
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
@@ -104,10 +123,12 @@ export class HttpService {
 	authHeaders.append('Content-Type', 'application/json');
 
 	/* Post the data */
+	console.log(JSON.stringify(this.bpm_json));
+
 	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints",
 		       JSON.stringify(this.bpm_json),
 		      { headers:authHeaders }).subscribe(
-			  data => console.log(JSON.stringify(data)),
+			  data => console.log("Posted " + value),
 			  error => alert("Post error. Is your token valid?")
 		      );
     }
