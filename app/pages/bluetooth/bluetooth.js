@@ -11,7 +11,7 @@ export class BluetoothPage {
     }
 
     constructor(bl,nav) {
-	BluetoothPage.bl = bl;
+	this.bl = bl;
 	this.nav = nav;
 
 	/* List of of found devices on scan */
@@ -22,13 +22,14 @@ export class BluetoothPage {
     {
 	/* Ensuring that Bluetooth is on */
 	statusDiv.innerHTML = "Initializing";
+	var self = this;
 	document.addEventListener('deviceready', function () {
 	    /* If already enabled, do nothing */
-	    BluetoothPage.bl.isEnabled().then(
+	    self.bl.isEnabled().then(
 		function() {},
 		function() {
 		    /* Otherwise, attempt to enable */
-		    BluetoothPage.bl.enable().then(
+		    self.bl.enable().then(
 			function() {},
 			function() {alert ("Bluetooth could not be enabled");}
 		    );
@@ -37,7 +38,7 @@ export class BluetoothPage {
 	});
 
 	/* Checking if a device is already connected */
-	BluetoothPage.bl.checkExistingBluetooth().then(
+	this.bl.checkExistingBluetooth().then(
 	    function() {statusDiv.innerHTML = "Connected";},
 	    function() {statusDiv.innerHTML = "Disconnected";}
 	);
@@ -50,7 +51,7 @@ export class BluetoothPage {
 	statusDiv.innerHTML = "Scanning";
 
 	/* BL scanning service returns a [timeout,subscription] pair */
-	var scanner = BluetoothPage.bl.startScan();
+	var scanner = this.bl.startScan();
 	var timeout = scanner[0];
 	var scanSub = scanner[1];
 	
@@ -68,7 +69,7 @@ export class BluetoothPage {
 
 	/* After the timeout, stop scanning and remove the loader */
 	setTimeout(() => {
-	    BluetoothPage.bl.stopScan();
+	    this.bl.stopScan();
 	    statusDiv.innerHTML = "Finished Scanning";
 	    loading.dismiss();
 	}, 1000 * timeout);
@@ -77,13 +78,13 @@ export class BluetoothPage {
     /* Executed when a user selects a device from the list;
        Connect to that device */
     connect(device) {
-	BluetoothPage.bl.connect(device);
+	this.bl.connect(device);
 	statusDiv.innerHTML = "Connected to " + device.name;
     }
 	
     /* Disconnect from any connected device */
     disconnect() {
-	BluetoothPage.bl.disconnect();
+	this.bl.disconnect();
 	statusDiv.innerHTML = "Disconnected";
     }
 }
