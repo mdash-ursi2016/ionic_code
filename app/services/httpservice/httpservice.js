@@ -95,6 +95,8 @@ export class HttpService {
 
 	/* Edit the JSON to post into the correct format*/
 	this.createJSON(value);
+
+	//alert(HttpService.token);
 	
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();

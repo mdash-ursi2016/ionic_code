@@ -23,8 +23,8 @@ export class DataPage {
 	this.endDate = "";
     }
 
-  /* Draw an empty graph when the page is first loaded */
-  onPageLoaded()
+  /* Draw an empty graph when the page enters */
+  onPageDidEnter()
     {
 	DataPage.labels = [];
 	DataPage.db = [];

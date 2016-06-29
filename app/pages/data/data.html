@@ -10,13 +10,10 @@
 <ion-content padding class="data">
 
   <h3>Data Page</h3>
-  <p>
-     This is  where all the long term visualization would go.
-  </p>
 
-  <button (click)="store()">Store Random Data</button>
-  <button (click)="retrieve()">Retrieve Data</button>
-  <button (click)="clear()">Clear Data</button>
+  <button small clear (click)="store()">Store</button>
+  <button small clear (click)="retrieve()">Retrieve</button>
+  <button small clear (click)="clear()">Clear</button>
 
   <ion-item>
     <ion-label>Start Date</ion-label>
@@ -30,8 +27,8 @@
   
   <br>
 
-  <canvas id="chart">Not supported</canvas>
+  <canvas id="chart">Charts not supported</canvas>
 
-  <button (click)="getToken()">Get Token</button>
+  <button block (click)="getToken()">Obtain Authorization Token</button>
 
 </ion-content>

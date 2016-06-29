@@ -41,7 +41,7 @@ export class HomePage {
 
 	/* Set the HTML element for usage if the page is left and re-entered */
 	this.content = content;
-	
+	this.msg = msg;
     }
 
 
@@ -50,6 +50,7 @@ export class HomePage {
 	   First make sure the subscription exists */
 	var connectSub = this.bl.getSubscription();
 	if (!connectSub) return;
+	this.msg.innerHTML = "";
 	
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
