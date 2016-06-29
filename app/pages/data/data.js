@@ -26,9 +26,9 @@ export class DataPage {
   /* Draw an empty graph when the page enters */
   onPageDidEnter()
     {
-	DataPage.labels = [];
-	DataPage.db = [];
-	DataPage.makeChart();
+	this.labels = [];
+	this.db = [];
+	this.makeChart();
     }
     
     /* Retrieve authorization token from server */
@@ -65,21 +65,22 @@ export class DataPage {
 
 	/* Get all the data from the database and graph it */
 	let j = 0;
-	DataPage.labels = [];
+	this.labels = [];
+	var self = this;
 	this.storage.retrieve(d1,d2).then(
 	    function(value) {
 		/* A data object is returned, iterate through it */
 		for (var i = 0; i < value.res.rows.length; i++) {
 		    /* Add data to graphing arrays */
-		    DataPage.labels.push(i.toString());
-		    DataPage.db.push(value.res.rows.item(i).value);
+		    self.labels.push(i.toString());
+		    self.db.push(value.res.rows.item(i).value);
 
 		    /* Because retrieving data takes time, we have a third
 		       variable checking for the end of the loop to update
 		       the graph */
 		    j++;
 		    if (j == value.res.rows.length) {
-			DataPage.makeChart();
+			self.makeChart();
 		    }
 
 		}
@@ -106,19 +107,19 @@ export class DataPage {
         this.nav.present(toast);
 
 	/* Reset the data and redraw the graph */
-	DataPage.labels = [];
-	DataPage.db = [];
-	DataPage.makeChart();
+	this.labels = [];
+	this.db = [];
+	this.makeChart();
     }
 
 
     /* Charts.js graph routine */
-    static makeChart() {
+    makeChart() {
 	var ctx = document.getElementById("chart");
 	var myChart = new Chart(ctx, {
 	    type: 'line',
 	    data: {
-		labels: DataPage.labels,
+		labels: this.labels,
 		datasets: [{
 		    label: "Heart Rate",
 		    fill: false,
@@ -138,7 +139,7 @@ export class DataPage {
 		    pointHoverBorderWidth: 2,
 		    pointRadius: 1,
 		    pointHitRadius: 10,
-		    data: DataPage.db,
+		    data: this.db,
 		    borderWidth: 1
 		}]
 	    },
