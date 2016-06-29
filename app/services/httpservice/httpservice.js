@@ -79,7 +79,7 @@ export class HttpService {
 	
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
-	authHeaders.append('Authorization', 'Bearer ' + HttpService.token);
+	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Accept', 'application/json');
 
 	/* Request the data */
@@ -95,7 +95,7 @@ export class HttpService {
     makePostRequest(value) {
 	
 	/* If the token isn't null, we can post immediately */
-	if (HttpService.token){
+	if (this.token){
 	    this.post(value);
 	    return;
 	}
@@ -103,7 +103,7 @@ export class HttpService {
 	/* Otherwise, we have to retrieve the token */
 	this.storage.retrieveToken().then(
 	    (token) => {
-		HttpService.token = token;
+		this.token = token;
 		this.post(value);
 	    }, function() {
 		alert("Token storage error");
@@ -119,7 +119,7 @@ export class HttpService {
 	
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
-	authHeaders.append('Authorization', 'Bearer ' + HttpService.token);
+	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Content-Type', 'application/json');
 
 	/* Post the data */
