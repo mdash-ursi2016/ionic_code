@@ -14,7 +14,7 @@ export class AboutPage {
   aboutAlert() {
     let alert = Alert.create({
       title: 'App Info',
-      message: 'Version 1.0.0<br>Last Updated: June 2, 2016',
+      message: 'Version 2.2.0<br>Last Updated: June 29, 2016',
       buttons: ['Ok']
     });
     /* Actually display the alert */

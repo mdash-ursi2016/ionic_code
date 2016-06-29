@@ -54,7 +54,7 @@ export class HomePage {
 	
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
-	    this.content.innerHTML = data;
+	    this.content.innerHTML = "<center>" + data + "</center>";
 	});
 	
 
