@@ -10,19 +10,19 @@ export class BLService {
 	return [[StorageService],[Events],[HttpService]];
     }
     constructor(storage,events,httpservice) {
-	BLService.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
+	this.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
 			       heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
 			       ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
 			       timeout: 3 }; /* Scan time in seconds */
 	
 	/* The storage service */
-	BLService.storage = storage;
+	this.storage = storage;
 
 	/* Used for publishing */
-	BLService.events = events;
+	this.events = events;
 
 	/* Custom HTTP service */
-	BLService.httpservice = httpservice;
+	this.httpservice = httpservice;
     }
 
     /* Return a Promise for if Bluetooth is enabled or not */
@@ -37,7 +37,7 @@ export class BLService {
 
     /* Return a pair including the scan timeout and the scan subscription */
     startScan() {
-        return [BLService.scanInfo.timeout, BLE.startScan([BLService.scanInfo.service])];
+        return [this.scanInfo.timeout, BLE.startScan([this.scanInfo.service])];
     }
     
     /* Stop scanning */
@@ -49,37 +49,37 @@ export class BLService {
     connect(peripheral) {
 	Vibration.vibrate(100);
 	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
-	    BLService.peripheral = peripheral;
-            BLService.connected(peripheral);
+	    this.peripheral = peripheral;
+            this.connected(peripheral);
         });
     }
 
     /* Record incoming data in storage */
-    static connected(peripheral) {
+    connected(peripheral) {
 	/* Subscription for the heart rate (BPM) */
-	BLService.HRsubscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.heartrate);
+	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
 	/* Subscription for the EKG data */
-	BLService.EKGsubscription = BLE.startNotification(peripheral.id, BLService.scanInfo.service, BLService.scanInfo.ekg);
+	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
 	/* Subscribe to the BPM */
-	BLService.HRsubscription.subscribe(buffer => {
+	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 	    data = data[0];
 	    /* Store data */
-            BLService.storage.store(new Date(),data);
+            this.storage.store(new Date(),data);
 	    /* Post the data to the server */
-	    BLService.httpservice.makePostRequest(parseInt(data));
+	    this.httpservice.makePostRequest(parseInt(data));
 
 	    /* Republish the data for the home page */
-	    BLService.events.publish('bpm',parseInt(data));
+	    this.events.publish('bpm',parseInt(data));
         });
 
 	/* Subscribe to the EKG */
 
-	BLService.EKGsubscription.subscribe(buffer => {
+	this.EKGsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 	    
 	    /* Republish the data for the home page */
-	    BLService.events.publish('ekg',data);
+	    this.events.publish('ekg',data);
 	});
     }
 
@@ -87,9 +87,11 @@ export class BLService {
     /* Called when the user wants to sever the Bluetooth connection */
     disconnect() {
 	let devID = null;
-	if (BLService.peripheral) {
+	var self = this;
+
+	if (this.peripheral) {
 	    /* The device id that is currently connected, or null */
-	    devID = BLService.peripheral.id;
+	    devID = this.peripheral.id;
 	}
 	BLE.isConnected(devID).then(
             /* Check if connected, and disconnect if so */
@@ -98,7 +100,7 @@ export class BLService {
                     function(dcResult) {
 
 			/* Reset the peripheral ID */
-			BLService.peripheral = null;
+			self.peripheral = null;
                     },
                     /* Could not disconnect for some reason */
                     function(dcResult) {
@@ -115,15 +117,15 @@ export class BLService {
 
     /* On page load, we want the status to reflect if the device is connected already */
     checkExistingBluetooth() {
-	if (BLService.peripheral) {
-            return BLE.isConnected(BLService.peripheral.id);
+	if (this.peripheral) {
+            return BLE.isConnected(this.peripheral.id);
 	}
 	/* Should always be a rejected Promise */
 	else return BLE.isConnected(null);
     }
 
     getSubscription() {
-	return BLService.HRsubscription;
+	return this.HRsubscription;
     }
 
 }
