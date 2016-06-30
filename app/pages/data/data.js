@@ -19,7 +19,14 @@ export class DataPage {
 	this.storage = storage;
 	/* Used for token/http requests */
 	this.httpservice = httpservice;
-	this.startDate = new Date().toISOString();
+	
+	this.canvasWidth = window.screen.width - 50;
+	this.canvasHeight = window.screen.height / 3;
+
+	/* Create the graph to display at first as the last 24 hours */
+	var d = new Date();
+	d.setDate(d.getDate() - 1);
+	this.startDate = d.toISOString();
 	this.endDate = new Date().toISOString();
     }
 
@@ -28,7 +35,9 @@ export class DataPage {
     {
 	this.labels = [];
 	this.db = [];
-	this.makeChart();
+
+	/* Initial Graphing */
+	this.retrieve();
     }
     
     /* Retrieve authorization token from server */
@@ -63,6 +72,7 @@ export class DataPage {
 	var d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]).toISOString();
 	var d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]).toISOString();
 	
+	/* Clear out the graph data */
 	this.labels = [];
 	this.db = [];
 
@@ -74,9 +84,10 @@ export class DataPage {
 	    /* Magic parsing techniques for the return value */
 	    dates = JSON.parse(dates._body);
 	    for (var i = 0; i < dates.length; i++) {
-
+		var dtStr = dates[i].header.creation_date_time.toString();
+		dtStr = dtStr.slice(5,10) + " " + dtStr.slice(11,16);
 		/* Push all of the dates as labels and values as points */
-		self.labels.push(dates[i].header.creation_date_time.toString());
+		self.labels.push(dtStr);
 		self.db.push(dates[i].body.heart_rate.value);
 	    }
 	    
@@ -139,6 +150,11 @@ export class DataPage {
 		}]
 	    },
 	    options: {
+		legend: {
+		    labels: {
+			boxWidth: 12
+		    }
+		},
 		scales: {
 		    xAxes: [{
 			ticks: {
