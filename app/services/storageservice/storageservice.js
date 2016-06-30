@@ -25,8 +25,8 @@ export class StorageService {
     
     /* Retrieve all data points from the database, loop over them, and display the values */
     retrieve(date1,date2) {
-	//return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
-	return this.storage.query('SELECT * FROM dataTable');
+	return this.storage.query('SELECT * FROM dataTable WHERE date BETWEEN ? AND ?',[date1,date2]);
+	//return this.storage.query('SELECT * FROM dataTable');
     }
 
     /* Delete the table */

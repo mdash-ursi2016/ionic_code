@@ -75,19 +75,44 @@ export class HttpService {
     
 
     /* Make a get request from the server */
-    makeGetRequest() {
+    makeGetRequest(d1,d2,requestFunction) {
+	/* If the token isn't null, we can get immediately */
+	if (this.token) {
+	    this.get(d1,d2,requestFunction);
+	    return;
+	}
 	
+	/* Otherwise we retrieve the token first */
+	this.storage.retrieveToken().then(
+	    (token) => {
+		this.token = token;
+		this.get(d1,d2,requestFunction);
+	    }, function() {
+		alert("Token storage error");
+	    }
+	);
+    }
+
+    /* Get helper function */
+    get(d1,d2,requestFunction) {
+
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Accept', 'application/json');
 
-	/* Request the data */
-	this.http.get("http://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schema_name=heart-rate&schema_version=1.0",
+	/* The url is the standard for get, plus the date queries */
+	let url = "http://143.229.6.40:443/v1.0.M1/dataPoints?schema_namespace=omh&schem\
+a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_before=" + d2;
+
+
+	/* Request the data and return via the callback */
+	this.http.get(url,
 		      { headers: authHeaders }).subscribe(
-			  data => console.log("Success"),
-			  error => alert("No")
+			  data => {requestFunction(data);},
+			  error => alert("Get request failed (are you plugged in?)")
 		      );
+	
     }
 
 
@@ -95,12 +120,15 @@ export class HttpService {
     makePostRequest(value) {
 	
 	/* If the token isn't null, we can post immediately */
-	if (this.token){
+	if (this.token) {
 	    this.post(value);
 	    return;
 	}
 
-	/* Otherwise, we have to retrieve the token */
+	/* Otherwise, we have to retrieve the token, noting
+	   that the call to post must be in the success function
+	   and not afterward because this call must only occur after the
+	   data is retrieved from storage, which takes a while */
 	this.storage.retrieveToken().then(
 	    (token) => {
 		this.token = token;

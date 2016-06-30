@@ -19,8 +19,8 @@ export class DataPage {
 	this.storage = storage;
 	/* Used for token/http requests */
 	this.httpservice = httpservice;
-	this.startDate = "";
-	this.endDate = "";
+	this.startDate = new Date().toISOString();
+	this.endDate = new Date().toISOString();
     }
 
   /* Draw an empty graph when the page enters */
@@ -60,36 +60,31 @@ export class DataPage {
 	let s2 = this.strParse(this.endDate);
 
 	/* The parse function separates ISO 8601 times into individual components */
-	let d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]);
-	let d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]);
-
-	/* Get all the data from the database and graph it */
-	let j = 0;
+	var d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]).toISOString();
+	var d2 = new Date(s2[0],s2[1],s2[2],s2[3],s2[4]).toISOString();
+	
 	this.labels = [];
+	this.db = [];
+
 	var self = this;
-	this.storage.retrieve(d1,d2).then(
-	    function(value) {
-		/* A data object is returned, iterate through it */
-		for (var i = 0; i < value.res.rows.length; i++) {
-		    /* Add data to graphing arrays */
-		    self.labels.push(i.toString());
-		    self.db.push(value.res.rows.item(i).value);
 
-		    /* Because retrieving data takes time, we have a third
-		       variable checking for the end of the loop to update
-		       the graph */
-		    j++;
-		    if (j == value.res.rows.length) {
-			self.makeChart();
-		    }
+	/* Make a get request, with a callback function for graphing */
+	this.httpservice.makeGetRequest(d1,d2, function(dates) {
 
-		}
-		
-	    },  
-	    function(value) { alert("Error"); }
-	);
+	    /* Magic parsing techniques for the return value */
+	    dates = JSON.parse(dates._body);
+	    for (var i = 0; i < dates.length; i++) {
+
+		/* Push all of the dates as labels and values as points */
+		self.labels.push(dates[i].header.creation_date_time.toString());
+		self.db.push(dates[i].body.heart_rate.value);
+	    }
+	    
+	    self.makeChart();
+
+	});
     }    
-
+	
     /* Erase the current graph and redraw with no data.
        This function should eventually be hidden in settings */
     clear() {
