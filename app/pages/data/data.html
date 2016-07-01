@@ -27,27 +27,31 @@
 
   <br>
 
-  <button item-center small royal round (click)="store()">Store</button>
-  <button item-center small secondary round (click)="retrieve()">Retrieve</button>
-  <button item-center small danger round (click)="clear()">Clear</button>  
+  <button small royal round (click)="store()">Store</button>
+  <button small secondary round (click)="retrieve()">Retrieve</button>
+  <button small danger round (click)="clear()">Clear</button>  
 
+  <br>
+
+  <p> The current time interval is {{convertMS(timeDiff)}} </p>
+  
   <br>
 
   <canvas id="chart" width={{canvasWidth}} height={{canvasHeight}}>Charts not supported</canvas>
 
-  <button small clear (click)="increaseTime()">
+  <button clear (click)="increaseTime()">
     <ion-icon name="add"></ion-icon>
   </button>
 
-  <button small clear (click)="decreaseTime()">
+  <button clear (click)="decreaseTime()">
     <ion-icon name="remove"></ion-icon>
   </button>
 
-  <button small clear (click)="shiftLeft()">
+  <button clear (click)="shiftLeft()">
     <ion-icon name="arrow-round-back"></ion-icon>
   </button>
 
-  <button small clear (click)="shiftRight()">
+  <button clear (click)="shiftRight()">
     <ion-icon name="arrow-round-forward"></ion-icon>
   </button>
 

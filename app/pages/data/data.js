@@ -36,16 +36,32 @@ export class DataPage {
 	/* Record the time between the start and end dates in milliseconds.
 	   Initially one day */
 	this.timeDiff = Math.abs(this.startDate - this.endDate);
+
+	this.str = "5 hours";
     }
 
   /* Draw an empty graph when the page enters */
-  onPageDidEnter()
+    onPageDidEnter()
     {
 	this.labels = [];
 	this.db = [];
-
+	
 	/* Initial Graphing */
 	this.retrieve();
+    }
+
+    /* Convert a millisecond time to days, hours, minutes, seconds.
+       Used for displaying the current time interval */
+    convertMS(ms) {
+	var d, h, m, s;
+	s = Math.floor(ms / 1000);
+	m = Math.floor(s / 60);
+	s = s % 60;
+	h = Math.floor(m / 60);
+	m = m % 60;
+	d = Math.floor(h / 24);
+	h = h % 24;
+	return "D: " + d + ", H: " + h + ", M: " + m + ", S: " + s;
     }
     
     /* Retrieve authorization token from server */
