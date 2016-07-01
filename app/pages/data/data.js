@@ -27,11 +27,14 @@ export class DataPage {
 	this.startDate = new Date();
 	this.endDate = new Date();
 
+	/* Set the start date (date on the left) to be one day earlier */
 	this.startDate.setDate(this.startDate.getDate() - 1);
 
 	this.startDateString = this.startDate.toISOString();
 	this.endDateString = this.endDate.toISOString();
 
+	/* Record the time between the start and end dates in milliseconds.
+	   Initially one day */
 	this.timeDiff = Math.abs(this.startDate - this.endDate);
     }
 
@@ -123,7 +126,8 @@ export class DataPage {
 	this.makeChart();
     }
 
-
+    /* Whatever the current time interval is, subtract it from the left bound (startDate).
+       Then double the time interval and redisplay the graph */
     increaseTime() {
 	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
 	this.timeDiff *= 2;
@@ -131,6 +135,8 @@ export class DataPage {
 	this.retrieve();
     }
 
+    /* Whatever the current time interval is, divide it by 2 and add it the left bound.
+       Then redisplay the graph */
     decreaseTime() {
 	this.timeDiff = Math.floor(this.timeDiff / 2);
 	this.startDate = new Date(this.startDate.getTime() + this.timeDiff);
