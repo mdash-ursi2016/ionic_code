@@ -24,10 +24,15 @@ export class DataPage {
 	this.canvasHeight = window.screen.height / 3;
 
 	/* Create the graph to display at first as the last 24 hours */
-	var d = new Date();
-	d.setDate(d.getDate() - 1);
-	this.startDate = d.toISOString();
-	this.endDate = new Date().toISOString();
+	this.startDate = new Date();
+	this.endDate = new Date();
+
+	this.startDate.setDate(this.startDate.getDate() - 1);
+
+	this.startDateString = this.startDate.toISOString();
+	this.endDateString = this.endDate.toISOString();
+
+	this.timeDiff = Math.abs(this.startDate - this.endDate);
     }
 
   /* Draw an empty graph when the page enters */
@@ -65,8 +70,8 @@ export class DataPage {
     /* Retrieve a fixed amount of data from storage and show the graph */
     retrieve() {
 	/* Get the dates from the Datetime Ionic component and create a Date() object */
-	let s1 = this.strParse(this.startDate);
-	let s2 = this.strParse(this.endDate);
+	let s1 = this.strParse(this.startDateString);
+	let s2 = this.strParse(this.endDateString);
 
 	/* The parse function separates ISO 8601 times into individual components */
 	var d1 = new Date(s1[0],s1[1],s1[2],s1[3],s1[4]).toISOString();
@@ -117,6 +122,25 @@ export class DataPage {
 	this.db = [];
 	this.makeChart();
     }
+
+
+    increaseTime() {
+	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
+	this.timeDiff *= 2;
+	this.startDateString = this.startDate.toISOString();
+	this.retrieve();
+    }
+
+    decreaseTime() {
+	this.timeDiff = Math.floor(this.timeDiff / 2);
+	this.startDate = new Date(this.startDate.getTime() + this.timeDiff);
+	this.startDateString = this.startDate.toISOString();
+	this.retrieve();
+    }
+	
+    
+
+
 
 
     /* Charts.js graph routine */
