@@ -143,6 +143,36 @@ export class DataPage {
 	this.startDateString = this.startDate.toISOString();
 	this.retrieve();
     }
+
+    /* Shift both dates to the left by half of the total amount of time currently being displayed */
+    shiftLeft() {
+	this.timeDiff = Math.floor(this.timeDiff / 2);
+	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
+	this.endDate = new Date(this.endDate.getTime() - this.timeDiff);
+	
+	/* The time difference is still the same since we shifted both ends,
+	   so we have to double it back*/
+	this.timeDiff *= 2;
+
+	this.startDateString = this.startDate.toISOString();
+	this.endDateString = this.endDate.toISOString();
+	this.retrieve();
+    }
+    
+    /* Shift both dates to the right by half of the total amount of time currently being displayed */
+    shiftRight() {
+	this.timeDiff = Math.floor(this.timeDiff / 2);
+	this.startDate = new Date(this.startDate.getTime() + this.timeDiff);
+	this.endDate = new Date(this.endDate.getTime() + this.timeDiff);
+	
+	/* The time difference is still the same since we shifted both ends,
+	   so we have to double it back*/
+	this.timeDiff *= 2;
+
+	this.startDateString = this.startDate.toISOString();
+	this.endDateString = this.endDate.toISOString();
+	this.retrieve();
+    }
 	
     
 
