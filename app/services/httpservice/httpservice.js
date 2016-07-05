@@ -157,7 +157,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 		       JSON.stringify(this.bpm_json),
 		      { headers:authHeaders }).subscribe(
 			  data => console.log("Posted " + value),
-			  error => alert("Post error. Is your token valid?")
+			  error => console.log("Post error. Is your token valid?")
 		      );
     }
 

@@ -42,6 +42,7 @@ export class HomePage {
 	/* Set the HTML element for usage if the page is left and re-entered */
 	this.content = content;
 	this.msg = msg;
+
     }
 
 

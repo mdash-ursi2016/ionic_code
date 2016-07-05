@@ -11,9 +11,9 @@ export class BLService {
     }
     constructor(storage,events,httpservice) {
 	this.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
-			       heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
-			       ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
-			       timeout: 3 }; /* Scan time in seconds */
+			  heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
+			  ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
+			  timeout: 3 }; /* Scan time in seconds */
 	
 	/* The storage service */
 	this.storage = storage;
@@ -51,7 +51,7 @@ export class BLService {
 	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
 	    this.peripheral = peripheral;
             this.connected(peripheral);
-        });
+        }, error => {console.log("Peripheral not found.");});
     }
 
     /* Record incoming data in storage */
@@ -64,13 +64,15 @@ export class BLService {
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 	    data = data[0];
+
 	    /* Store data */
             this.storage.store(new Date(),data);
-	    /* Post the data to the server */
-	    this.httpservice.makePostRequest(parseInt(data));
 
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',parseInt(data));
+
+	    /* Post the data to the server */
+	    this.httpservice.makePostRequest(parseInt(data));
         });
 
 	/* Subscribe to the EKG */

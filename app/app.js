@@ -20,11 +20,13 @@ import {HttpService} from './services/httpservice/httpservice';
 })
 class MyApp {
   static get parameters() {
-    return [[Platform]];
+    return [[Platform],[StorageService],[BLService]];
   }
 
-  constructor(platform) {
+  constructor(platform,storage,blservice) {
     this.platform = platform;
+    this.storage = storage;
+    this.blservice = blservice;
 
     this.initializeApp();
 
@@ -43,6 +45,23 @@ class MyApp {
     this.platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
+      
+      /* Enable background mode and set the heads up notification text */
+      cordova.plugins.backgroundMode.enable();
+      cordova.plugins.backgroundMode.setDefaults({
+	  title: "URSI App",
+	  ticker: "",
+	  text: "Currently Working"
+      });
+
+      document.addEventListener("pause",function() {
+	  console.log("paused");
+      });
+     
+      document.addEventListener("resume",function() {
+	  console.log("resumed");
+      });
+
       StatusBar.styleDefault();
     });
   }
