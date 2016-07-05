@@ -62,6 +62,7 @@ class MyApp {
 	  console.log("resumed");
       });
 
+
       StatusBar.styleDefault();
     });
   }

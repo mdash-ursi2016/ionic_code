@@ -12,6 +12,9 @@ export class HttpService {
 	this.http = http;
 	this.storage = storage;
 
+	/* Whether the token is valid or not. Assume it's good initially */
+	this.goodToken = true;
+
 	/* The format of a post to the server */
 	this.bpm_json = 
 	    {
@@ -46,6 +49,7 @@ export class HttpService {
 
     /* Opens a browser, allows user to login, return with access token */
     getToken() {
+	var self = this;
 	return new Promise(function(resolve, reject) {
 
 	    /* Open the URL in app without header information (URL, back/forward buttons, etc.) */
@@ -63,6 +67,8 @@ export class HttpService {
 		    let token = (event.url).split("=")[1].split("&")[0];
 
 		    if (token !== null) {
+			/* Mark that a token is valid */
+			this.goodToken = true;
 			/* Set the token for post requests */
 			resolve (token);
 		    }
@@ -141,6 +147,8 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
     
     /* Post helper function */
     post(value) {
+	if (!this.goodToken)
+	    return;
 
 	/* Edit the JSON to post into the correct format*/
 	this.createJSON(value);
@@ -151,13 +159,14 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	authHeaders.append('Content-Type', 'application/json');
 
 	/* Post the data */
-	console.log(JSON.stringify(this.bpm_json));
-
 	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints",
 		       JSON.stringify(this.bpm_json),
 		      { headers:authHeaders }).subscribe(
 			  data => console.log("Posted " + value),
-			  error => console.log("Post error. Is your token valid?")
+			  error => {
+			      alert("Post error. Is your token valid?");
+			      this.goodToken = false;
+			  }
 		      );
     }
 

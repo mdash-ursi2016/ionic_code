@@ -18,6 +18,7 @@ export class HomePage {
     }
 
     onPageDidEnter() {
+	
 	var points = [];
 	var head = 0;
 
@@ -42,6 +43,9 @@ export class HomePage {
 	/* Set the HTML element for usage if the page is left and re-entered */
 	this.content = content;
 	this.msg = msg;
+
+	console.log(JSON.stringify(this.content.content));
+	console.log(JSON.stringify(this.msg));
 
     }
 
