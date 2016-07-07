@@ -56,14 +56,10 @@ export class BLService {
 
     /* Record incoming data in storage */
     connected(peripheral) {
-	var uint8 = new Uint8Array(1);
-	uint8[0] = 5;
-	console.log(uint8.buffer.byteLength);
-	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate, uint8.buffer).then(
-	    succ => {alert("SUCCESS");},
-	    fail => {alert(JSON.stringify(fail));}
-	);
 
+	/* Inform the peripheral of the current date */
+	this.sendDate();
+	
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
 	/* Subscription for the EKG data */
@@ -93,6 +89,30 @@ export class BLService {
 	    this.events.publish('ekg',data);
 	});
     }
+
+    /* Inform the peripheral of the current date */
+    sendDate() {
+
+	/* Data must be sent through the BLE plugin as an ArrayBuffer */
+	let uint8 = new Uint8Array(4);
+
+	/* Grab the current time without milliseconds */
+	let time = Math.floor((new Date).getTime() / 1000);
+
+	/* Store the time in 4 byte increments */
+	uint8[0] = time & 0xFF;
+	uint8[1] = (time & 0xFF00) >>> 8;
+	uint8[2] = (time & 0xFF0000) >>> 16;
+	uint8[3] = (time & 0xFF000000) >>> 24;
+	
+	/* Write the data to the peripheral */
+	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate, uint8.buffer).then(
+	    succ => {alert(JSON.stringify(succ));},
+	    fail => {alert(JSON.stringify(fail));}
+	);
+    }
+
+
 
 
     /* Called when the user wants to sever the Bluetooth connection */

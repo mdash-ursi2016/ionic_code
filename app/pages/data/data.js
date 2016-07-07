@@ -49,7 +49,7 @@ export class DataPage {
 	this.retrieve();
     }
     
-    /* Turn the given date into LOCAL ISO time */
+    /* Turn the given date into local ISO time */
     formatLocalDate(dt) {
         var tzo = -dt.getTimezoneOffset(),
         dif = tzo >= 0 ? '+' : '-',
@@ -151,7 +151,7 @@ export class DataPage {
     increaseTime() {
 	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
 	this.timeDiff *= 2;
-	this.startDateString = this.startDate.toISOString();
+	this.startDateString = this.formatLocalDate(this.startDate);
 	this.retrieve();
     }
 
@@ -160,7 +160,7 @@ export class DataPage {
     decreaseTime() {
 	this.timeDiff = Math.floor(this.timeDiff / 2);
 	this.startDate = new Date(this.startDate.getTime() + this.timeDiff);
-	this.startDateString = this.startDate.toISOString();
+	this.startDateString = this.formatLocalDate(this.startDate);
 	this.retrieve();
     }
 
@@ -174,8 +174,8 @@ export class DataPage {
 	   so we have to double it back*/
 	this.timeDiff *= 2;
 
-	this.startDateString = this.startDate.toISOString();
-	this.endDateString = this.endDate.toISOString();
+	this.startDateString = this.formatLocalDate(this.startDate);
+	this.endDateString = this.formatLocalDate(this.endDate);
 	this.retrieve();
     }
     
@@ -189,8 +189,8 @@ export class DataPage {
 	   so we have to double it back*/
 	this.timeDiff *= 2;
 
-	this.startDateString = this.startDate.toISOString();
-	this.endDateString = this.endDate.toISOString();
+	this.startDateString = this.formatLocalDate(this.startDate);
+	this.endDateString = this.formatLocalDate(this.endDate);
 	this.retrieve();
     }
 	
