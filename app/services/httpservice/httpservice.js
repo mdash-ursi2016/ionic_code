@@ -15,32 +15,6 @@ export class HttpService {
 	/* Whether the token is valid or not. Assume it's good initially */
 	this.goodToken = true;
 
-	/* The format of a post to the server */
-	this.bpm_json = 
-	    {
-		"header":{
-		    "id":"0",
-		    "creation_date_time":"SOME_TIMESTAMP",
-		    "acquisition_provenance":{
-			"source_name":"arduino",
-			"modality":"sensed"
-		    },
-		    "schema_id":{
-			"namespace":"omh",
-			"name":"heart-rate",
-			"version":"1.0"
-		    }
-		},
-		"body":{
-		    "heart_rate": {
-			"value":0,
-			"unit":"beats/min"
-		    },
-		    "effective_time_frame":{
-			"date_time":"SOME_TIMESTAMP"
-		    }
-		}
-	    };
 
     }
 
@@ -123,11 +97,11 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 
 
     /* Make a post request to the server */
-    makePostRequest(value) {
+    makePostRequest(value,date) {
 	
 	/* If the token isn't null, we can post immediately */
 	if (this.token) {
-	    this.post(value);
+	    this.post(value,date);
 	    return;
 	}
 
@@ -138,7 +112,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	this.storage.retrieveToken().then(
 	    (token) => {
 		this.token = token;
-		this.post(value);
+		this.post(value,date);
 	    }, function() {
 		alert("Token storage error");
 	    }
@@ -146,38 +120,67 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
     }
     
     /* Post helper function */
-    post(value) {
+    post(value,date) {
 	if (!this.goodToken)
 	    return;
 
 	/* Edit the JSON to post into the correct format*/
-	this.createJSON(value);
+	var tmp = this.createJSON(value,date);
 	
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Content-Type', 'application/json');
 
+	console.log(JSON.stringify(tmp));
+
 	/* Post the data */
 	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints",
-		       JSON.stringify(this.bpm_json),
+		       JSON.stringify(tmp),
 		      { headers:authHeaders }).subscribe(
 			  data => console.log("Posted " + value),
 			  error => {
-			      alert("Post error. Is your token valid?");
 			      this.goodToken = false;
+			      alert("Post error. Is your token valid?");
 			  }
 		      );
     }
 
     /* Change the JSON template with desired information.
        Correct dates not implemented yet */
-    createJSON(value) {
+    createJSON(value,date) {
+	/* The format of a post to the server */
+	var bpm_json = 
+	    {
+		"header":{
+		    "id":"0",
+		    "creation_date_time":"SOME_TIMESTAMP",
+		    "acquisition_provenance":{
+			"source_name":"arduino",
+			"modality":"sensed"
+		    },
+		    "schema_id":{
+			"namespace":"omh",
+			"name":"heart-rate",
+			"version":"1.0"
+		    }
+		},
+		"body":{
+		    "heart_rate": {
+			"value":0,
+			"unit":"beats/min"
+		    },
+		    "effective_time_frame":{
+			"date_time":"SOME_TIMESTAMP"
+		    }
+		}
+	    };
 
-	this.bpm_json.header.creation_date_time = new Date().toISOString();
-	this.bpm_json.header.id = ((new Date).getTime()).toString();
-	this.bpm_json.body.heart_rate.value = value;
-	this.bpm_json.body.effective_time_frame.date_time = new Date().toISOString();
+	bpm_json.header.creation_date_time = date.toISOString();
+	bpm_json.header.id = new Date().getTime().toString();
+	bpm_json.body.heart_rate.value = value;
+	bpm_json.body.effective_time_frame.date_time = date.toISOString();
+	return bpm_json;
     }
 
 }

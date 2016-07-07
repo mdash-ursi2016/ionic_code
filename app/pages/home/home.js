@@ -44,9 +44,6 @@ export class HomePage {
 	this.content = content;
 	this.msg = msg;
 
-	console.log(JSON.stringify(this.content.content));
-	console.log(JSON.stringify(this.msg));
-
     }
 
 

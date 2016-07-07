@@ -31,15 +31,15 @@ export class DataPage {
 	/* Set the start date (date on the left) to be one day earlier */
 	this.startDate.setDate(this.startDate.getDate() - 1);
 
-	this.startDateString = this.startDate.toISOString();
-	this.endDateString = this.endDate.toISOString();
+	this.startDateString = this.formatLocalDate(this.startDate);
+	this.endDateString = this.formatLocalDate(this.endDate);
 
 	/* Record the time between the start and end dates in milliseconds.
 	   Initially one day */
 	this.timeDiff = Math.abs(this.startDate - this.endDate);
     }
 
-  /* Draw an empty graph when the page enters */
+    /* Draw an empty graph when the page enters */
     onPageDidEnter()
     {
 	this.labels = [];
@@ -47,6 +47,24 @@ export class DataPage {
 	
 	/* Initial Graphing */
 	this.retrieve();
+    }
+    
+    /* Turn the given date into LOCAL ISO time */
+    formatLocalDate(dt) {
+        var tzo = -dt.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function(num) {
+            var norm = Math.abs(Math.floor(num));
+            return (norm < 10 ? '0' : '') + norm;
+        };
+	return dt.getFullYear() 
+            + '-' + pad(dt.getMonth()+1)
+            + '-' + pad(dt.getDate())
+            + 'T' + pad(dt.getHours())
+            + ':' + pad(dt.getMinutes()) 
+            + ':' + pad(dt.getSeconds()) 
+            + dif + pad(tzo / 60) 
+            + ':' + pad(tzo % 60);
     }
 
 

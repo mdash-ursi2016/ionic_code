@@ -1,4 +1,3 @@
-
 <ion-navbar *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
@@ -17,15 +16,16 @@
 
   <ion-item>
     <ion-label>Start Date</ion-label>
-    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="startDateString"></ion-datetime>
+    <ion-datetime displayFormat="MMM DD, h:mm A" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="startDateString"></ion-datetime>
   </ion-item>
 
   <ion-item>
     <ion-label>End Date</ion-label>
-    <ion-datetime displayFormat="MMM DD, YYYY HH:mm" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="endDateString"></ion-datetime>
+    <ion-datetime displayFormat="MMM DD, h:mm A" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="endDateString"></ion-datetime>
   </ion-item>
 
   <br>
+
 
   <button small royal round (click)="store()">Store</button>
   <button small secondary round (click)="retrieve()">Retrieve</button>

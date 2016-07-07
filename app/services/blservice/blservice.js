@@ -56,23 +56,32 @@ export class BLService {
 
     /* Record incoming data in storage */
     connected(peripheral) {
+	var uint8 = new Uint8Array(1);
+	uint8[0] = 5;
+	console.log(uint8.buffer.byteLength);
+	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate, uint8.buffer).then(
+	    succ => {alert("SUCCESS");},
+	    fail => {alert(JSON.stringify(fail));}
+	);
+
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
 	/* Subscription for the EKG data */
 	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
-	    var data = new Uint8Array(buffer);
-	    data = data[0];
-
+	    var data = new Uint32Array(buffer);
+	    console.log(JSON.stringify(data));
+	    //data = data[0];
+	    //console.log(data);
 	    /* Store data */
-            this.storage.store(new Date(),data);
+            this.storage.store(new Date(data[1]),data[0]);
 
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',parseInt(data));
 
 	    /* Post the data to the server */
-	    this.httpservice.makePostRequest(parseInt(data));
+	    this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
         });
 
 	/* Subscribe to the EKG */
