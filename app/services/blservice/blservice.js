@@ -58,7 +58,7 @@ export class BLService {
     connected(peripheral) {
 
 	/* Inform the peripheral of the current date */
-	this.sendDate();
+	this.sendDate(peripheral);
 	
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
@@ -91,7 +91,7 @@ export class BLService {
     }
 
     /* Inform the peripheral of the current date */
-    sendDate() {
+    sendDate(peripheral) {
 
 	/* Data must be sent through the BLE plugin as an ArrayBuffer */
 	let uint8 = new Uint8Array(4);
@@ -105,11 +105,13 @@ export class BLService {
 	uint8[2] = (time & 0xFF0000) >>> 16;
 	uint8[3] = (time & 0xFF000000) >>> 24;
 	
+
 	/* Write the data to the peripheral */
 	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate, uint8.buffer).then(
-	    succ => {alert(JSON.stringify(succ));},
-	    fail => {alert(JSON.stringify(fail));}
+	    succ => {console.log(JSON.stringify(succ));},
+	    fail => {console.log(JSON.stringify(fail));}
 	);
+
     }
 
 
