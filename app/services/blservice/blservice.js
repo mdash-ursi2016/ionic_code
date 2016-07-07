@@ -11,8 +11,9 @@ export class BLService {
     }
     constructor(storage,events,httpservice) {
 	this.scanInfo = { service: 'aa7b3c40-f6ed-4ffc-bc29-5750c59e74b3', /* Heart rate service */
-			  heartrate: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Heart rate characteristic */
+			  heartrate: 'b0351694-25e6-4eb5-918c-ca9403ddac47', /* Heart rate characteristic */
 			  ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
+			  timechar: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Date write characteristic */
 			  timeout: 3 }; /* Scan time in seconds */
 	
 	/* The storage service */
@@ -104,12 +105,11 @@ export class BLService {
 	uint8[1] = (time & 0xFF00) >>> 8;
 	uint8[2] = (time & 0xFF0000) >>> 16;
 	uint8[3] = (time & 0xFF000000) >>> 24;
-	
 
 	/* Write the data to the peripheral */
-	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate, uint8.buffer).then(
-	    succ => {console.log(JSON.stringify(succ));},
-	    fail => {console.log(JSON.stringify(fail));}
+	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.timechar, uint8.buffer).then(
+	    succ => {alert(JSON.stringify(succ));},
+	    fail => {alert(JSON.stringify(fail));}
 	);
 
     }
