@@ -78,7 +78,7 @@ export class BLService {
 	    this.events.publish('bpm',parseInt(data));
 
 	    /* Post the data to the server */
-	    this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
+	    //this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
         });
 
 	/* Subscribe to the EKG */

@@ -48,6 +48,7 @@ export class DataPage {
 	/* Initial Graphing */
 	this.retrieve();
     }
+
     
     /* Turn the given date into local ISO time */
     formatLocalDate(dt) {

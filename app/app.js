@@ -31,6 +31,8 @@ class MyApp {
 	
 	this.initializeApp();
 	
+	this.jsons = [];
+
 	// used for an example of ngFor and navigation
 	this.pages = [
 	    { title: 'Home', component: HomePage },
@@ -62,7 +64,8 @@ class MyApp {
 	    document.addEventListener("resume",function() {
 		console.log("resumed");
 	    });
-	    
+
+	    /* Function that regulates periodic server posting */
 	    this.pushTimer();
 
 	    
@@ -76,35 +79,37 @@ class MyApp {
 	this.nav.setRoot(page.component);
     }
 
-
+    
     pushTimer() {
 	setTimeout(() =>  {
-	    //var values = [];
-	    //var dates = [];
-	    var jsons = [];
-	    //console.log("timer is reached");
+	    this.jsons = [];
+
+	    /* Grab all the data from storage */
 	    this.storage.retrieve().then(
 		data => {
+		    /* If successful, cycle through and create an array of JSONs
+		       in the correct format for the server to read */
 		    for (var i = 0; i < data.res.rows.length; i++) {
-			//values.push(data.res.rows.item(i).value);
-			//dates.push(new Date(data.res.rows.item(i).date));
-			//jsons.push(this.httpservice.createJSON(
-			//    data.res.rows.item(i).value,
-			//    new Date(data.res.rows.item(i).date))
-			//);
-			//console.log(i);
-			//console.log(typeof data.res.rows.item(i).date);
+			this.jsons.push(this.httpservice.createJSON(
+			    data.res.rows.item(i).value,
+			    new Date(data.res.rows.item(i).date)));
 		    }
-		    if (jsons.length > 0) {
-			//console.log(JSON.stringify(jsons));
-			this.httpservice.makePostRequest(jsons);
+		    /* If there's any data, we want to post it */
+		    if (this.jsons.length > 0) {
+			var self = this;
+			this.httpservice.makePostRequest(this.jsons, function() {
+			    /* Success callback if the data was posted. Clear out the storage */
+			    self.storage.clear();
+			    self.storage.makeTable();
+			});
 		    }
 		}, err => {
 		    console.log("Error");
 		}
 	    );
+	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 20000);
+	}, 300000);
     }
 
 }

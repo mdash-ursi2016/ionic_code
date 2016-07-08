@@ -12,9 +12,6 @@ export class HttpService {
 	this.http = http;
 	this.storage = storage;
 
-	/* Whether the token is valid or not. Assume it's good initially */
-	this.goodToken = true;
-
 
     }
 
@@ -41,8 +38,6 @@ export class HttpService {
 		    let token = (event.url).split("=")[1].split("&")[0];
 
 		    if (token !== null) {
-			/* Mark that a token is valid */
-			this.goodToken = true;
 			/* Set the token for post requests */
 			resolve (token);
 		    }
@@ -97,11 +92,11 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 
 
     /* Make a post request to the server */
-    makePostRequest(value,date) {
+    makePostRequest(value,success) {
 	
 	/* If the token isn't null, we can post immediately */
 	if (this.token) {
-	    this.post(value,date);
+	    this.post(value,success);
 	    return;
 	}
 
@@ -112,7 +107,7 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	this.storage.retrieveToken().then(
 	    (token) => {
 		this.token = token;
-		this.post(value,date);
+		this.post(value,success);
 	    }, function() {
 		alert("Token storage error");
 	    }
@@ -120,28 +115,19 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
     }
     
     /* Post helper function */
-    post(value,date) {
-	if (!this.goodToken)
-	    return;
-
-	/* Edit the JSON to post into the correct format*/
-	var tmp = this.createJSON(value,date);
-	
+    post(value,success) {
 	/* Create headers (includes token) */
 	var authHeaders = new Headers();
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Content-Type', 'application/json');
 
-	console.log(JSON.stringify(tmp));
-
 	/* Post the data */
-	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints",
-		       JSON.stringify(tmp),
+	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints/multi",
+		       JSON.stringify(value), /* Value here is an array of JSONs in server compatible format */
 		      { headers:authHeaders }).subscribe(
-			  data => console.log("Posted " + value),
+			  data => success(),
 			  error => {
-			      this.goodToken = false;
-			      alert("Post error. Is your token valid?");
+			      alert("Post error. Is your token valid and are you online?");
 			  }
 		      );
     }
