@@ -54,15 +54,31 @@ class MyApp {
 	    cordova.plugins.backgroundMode.setDefaults({
 		title: "URSI App",
 		ticker: "",
-		text: "Currently Working"
+		text: "Collecting Data"
 	    });
 	    
 	    document.addEventListener("pause",function() {
-		console.log("paused");
+		this.blservice.disconnect();
 	    });
 	    
 	    document.addEventListener("resume",function() {
-		console.log("resumed");
+		let scanner = this.bl.startScan();
+		var timeout = scanner[0];
+		var scanSub = scanner[1];
+
+		var id;
+
+		this.storage.retrievePeripheral().then(storedID => {
+		    id = storedID;
+		});
+
+		scanSub.subscribe(device => {
+		    if (device.id == id)
+			alert("Found a match!");
+		    else
+			alert("No match found");
+		});
+
 	    });
 
 	    /* Function that regulates periodic server posting */
@@ -101,6 +117,7 @@ class MyApp {
 			    /* Success callback if the data was posted. Clear out the storage */
 			    self.storage.clear();
 			    self.storage.makeTable();
+			    alert("Post request complete");
 			});
 		    }
 		}, err => {
@@ -109,7 +126,7 @@ class MyApp {
 	    );
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 300000);
+	}, 30000);
     }
 
 }

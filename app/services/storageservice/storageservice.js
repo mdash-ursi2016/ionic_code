@@ -46,4 +46,15 @@ export class StorageService {
     retrieveToken() {
 	return this.storage.get('token');
     }
+
+    /* Save the peripheral id */
+    storePeripheral(id) {
+	this.storage.set('peripheral',id);
+    }
+
+    /* Retrieve the peripheral id */
+    retrievePeripheral() {
+	return this.storage.get('peripheral');
+    }
+
 }

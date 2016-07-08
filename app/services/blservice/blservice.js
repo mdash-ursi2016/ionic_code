@@ -50,6 +50,7 @@ export class BLService {
     connect(peripheral) {
 	Vibration.vibrate(100);
 	var connectSub = BLE.connect(peripheral.id).subscribe(result => {
+	    this.storage.storePeripheral(peripheral.id);
 	    this.peripheral = peripheral;
             this.connected(peripheral);
         }, error => {console.log("Peripheral not found.");});
@@ -69,10 +70,8 @@ export class BLService {
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint32Array(buffer);
 	    console.log(JSON.stringify(data));
-	    //data = data[0];
-	    //console.log(data);
-	    /* Store data */
-            this.storage.store(new Date(data[1]),data[0]);
+	    /* Store data (date * 1000 to account for milliseconds) */
+	    this.storage.store(new Date(data[1] * 1000),data[0]);
 
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',parseInt(data));
@@ -108,8 +107,8 @@ export class BLService {
 
 	/* Write the data to the peripheral */
 	BLE.write(peripheral.id, this.scanInfo.service, this.scanInfo.timechar, uint8.buffer).then(
-	    succ => {alert(JSON.stringify(succ));},
-	    fail => {alert(JSON.stringify(fail));}
+	    succ => {console.log(JSON.stringify(succ));},
+	    fail => {console.log(JSON.stringify(fail));}
 	);
 
     }
