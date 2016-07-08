@@ -1,5 +1,5 @@
 import {ViewChild} from '@angular/core';
-import {App, Platform} from 'ionic-angular';
+import {App, Platform, NavController, Toast} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {HomePage} from './pages/home/home';
 import {BluetoothPage} from './pages/bluetooth/bluetooth';
@@ -20,7 +20,7 @@ import {HttpService} from './services/httpservice/httpservice';
 })
 class MyApp {
   static get parameters() {
-    return [[Platform],[StorageService],[BLService], [HttpService]];
+    return [[Platform],[StorageService],[BLService],[HttpService]];
   }
 
     constructor(platform,storage,blservice,httpservice) {
@@ -70,7 +70,7 @@ class MyApp {
 
 		this.storage.retrievePeripheral().then(storedID => {
 		    id = storedID;
-		});
+		})
 
 		scanSub.subscribe(device => {
 		    if (device.id == id)
@@ -117,7 +117,13 @@ class MyApp {
 			    /* Success callback if the data was posted. Clear out the storage */
 			    self.storage.clear();
 			    self.storage.makeTable();
-			    alert("Post request complete");
+			    let toast = Toast.create({
+				message: "Data posted to server",
+				duration: 2000,
+				position: 'bottom',
+				showCloseButton: true
+			    });
+			    self.nav.present(toast);
 			});
 		    }
 		}, err => {

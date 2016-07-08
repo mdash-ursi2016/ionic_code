@@ -64,8 +64,10 @@ export class BLService {
 	
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
+
 	/* Subscription for the EKG data */
 	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
+
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint32Array(buffer);
@@ -81,7 +83,6 @@ export class BLService {
         });
 
 	/* Subscribe to the EKG */
-
 	this.EKGsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 	    

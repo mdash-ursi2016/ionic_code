@@ -11,7 +11,7 @@ export class HttpService {
     constructor(http,storage) {
 	this.http = http;
 	this.storage = storage;
-
+	this.appendIndex = 0;
 
     }
 
@@ -121,6 +121,8 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	authHeaders.append('Authorization', 'Bearer ' + this.token);
 	authHeaders.append('Content-Type', 'application/json');
 
+	alert(JSON.stringify(value));
+
 	/* Post the data */
 	this.http.post("http://143.229.6.40:443/v1.0.M1/dataPoints/multi",
 		       JSON.stringify(value), /* Value here is an array of JSONs in server compatible format */
@@ -163,9 +165,12 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	    };
 
 	bpm_json.header.creation_date_time = date.toISOString();
-	bpm_json.header.id = new Date().getTime().toString();
+	bpm_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
 	bpm_json.body.heart_rate.value = value;
 	bpm_json.body.effective_time_frame.date_time = date.toISOString();
+	
+	this.appendIndex++;
+	
 	return bpm_json;
     }
 
