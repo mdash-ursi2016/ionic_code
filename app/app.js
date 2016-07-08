@@ -57,30 +57,34 @@ class MyApp {
 		text: "Collecting Data"
 	    });
 	    
+	    var self = this;
 	    document.addEventListener("pause",function() {
-		this.blservice.disconnect();
+		/* On app leave, disconnect immediately */
+		self.blservice.disconnect();
 	    });
 	    
 	    document.addEventListener("resume",function() {
-		let scanner = this.bl.startScan();
+		/* On app resume, we must scan available devices to see if one
+		   has been connected to last */
+		let scanner = self.blservice.startScan();
 		var timeout = scanner[0];
 		var scanSub = scanner[1];
 
 		var id;
 
-		this.storage.retrievePeripheral().then(storedID => {
+		self.storage.retrievePeripheral().then(storedID => {
 		    id = storedID;
 		})
 
 		scanSub.subscribe(device => {
-		    if (device.id == id)
+		    if (device.id == id) {
 			alert("Found a match!");
-		    else
-			alert("No match found");
+		    }
+		    /* A device was found that we weren't connected to last */
+		    else {}
 		});
 
 	    });
-
 	    /* Function that regulates periodic server posting */
 	    this.pushTimer();
 
@@ -132,7 +136,7 @@ class MyApp {
 	    );
 	    /* Repeat this function again in 5 minutes */
 	    this.pushTimer();
-	}, 30000);
+	}, 300000);
     }
 
 }

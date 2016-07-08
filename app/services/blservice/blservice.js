@@ -58,26 +58,19 @@ export class BLService {
 
     /* Record incoming data in storage */
     connected(peripheral) {
-
 	/* Inform the peripheral of the current date */
 	this.sendDate(peripheral);
-	
 	/* Subscription for the heart rate (BPM) */
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
-
 	/* Subscription for the EKG data */
 	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
-
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint32Array(buffer);
-	    console.log(JSON.stringify(data));
 	    /* Store data (date * 1000 to account for milliseconds) */
 	    this.storage.store(new Date(data[1] * 1000),data[0]);
-
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',parseInt(data));
-
 	    /* Post the data to the server */
 	    //this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
         });

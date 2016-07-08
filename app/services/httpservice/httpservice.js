@@ -165,6 +165,9 @@ a_name=heart-rate&schema_version=1.0&created_on_or_after=" + d1 + "&created_befo
 	    };
 
 	bpm_json.header.creation_date_time = date.toISOString();
+	
+	/* Oftentimes when posting multiple numbers will be assigned IDs within the same
+	   millisecond. Add a counter to the end to combat this. */
 	bpm_json.header.id = new Date().getTime().toString() + "-" + this.appendIndex.toString();
 	bpm_json.body.heart_rate.value = value;
 	bpm_json.body.effective_time_frame.date_time = date.toISOString();
