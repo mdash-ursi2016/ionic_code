@@ -75,7 +75,6 @@ class MyApp {
     pauseOperations() {
 	/* On app leave, disconnect immediately */
 	this.blservice.disconnect();
-	
 	/* Every 5 minutes, reconnect with this method */
 	setTimeout(() => {
 	    /* We must scan available devices to see if one                                                            
@@ -89,6 +88,7 @@ class MyApp {
 	    /* Retrieve the last used device id from storage */
             this.storage.retrievePeripheral().then(storedID => {
 		id = storedID;
+		alert(id);
 	    
 		/* Scan for peripherals and see if a match is found */
 		scanSub.subscribe(device => {
@@ -96,7 +96,7 @@ class MyApp {
 			/* If so, connect, and disconnect 30 seconds later */
 			this.blservice.connect(device);
 			setTimeout(() => {
-			    this.blservice.disconnect();
+			    this.pauseOperations();
 			},30000);
 		    }
 		    /* A device was found that we weren't connected to last */
@@ -109,7 +109,12 @@ class MyApp {
 		    console.log("Scan finished");
 		}, 2000 * timeout);
 	    });
-	},300000);
+
+	    /* Propgagate paused functionality
+	       Should only occur if background mode currently active */
+	    this.pauseOperations();
+
+	},45000);
     }
 
     resumeOperations() {
