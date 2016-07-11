@@ -89,27 +89,26 @@ class MyApp {
 	    /* Retrieve the last used device id from storage */
             this.storage.retrievePeripheral().then(storedID => {
 		id = storedID;
+	    
+		/* Scan for peripherals and see if a match is found */
+		scanSub.subscribe(device => {
+		    if (device.id == id) {
+			/* If so, connect, and disconnect 30 seconds later */
+			this.blservice.connect(device);
+			setTimeout(() => {
+			    this.blservice.disconnect();
+			},30000);
+		    }
+		    /* A device was found that we weren't connected to last */
+		    else {}
+		});
+		
+		/* Stop scan at twice usual time because it's in the background */
+		setTimeout(() => {
+		    this.blservice.stopScan();
+		    console.log("Scan finished");
+		}, 2000 * timeout);
 	    });
-	    
-	    /* Scan for peripherals and see if a match is found */
-            scanSub.subscribe(device => {
-		if (device.id == id) {
-		    /* If so, connect, and disconnect 30 seconds later */
-                    this.blservice.connect(device);
-		    setTimeout(() => {
-			this.blservice.disconnect();
-		    },30000);
-		}
-		/* A device was found that we weren't connected to last */
-		else {}
-            });
-	    
-	    /* Stop scan at twice usual time because it's in the background */
-            setTimeout(() => {
-		this.blservice.stopScan();
-		console.log("Scan finished");
-            }, 2000 * timeout);
-	    
 	},300000);
     }
 
@@ -125,31 +124,30 @@ class MyApp {
 	/* Retrieve the last used decive id from storage */
 	this.storage.retrievePeripheral().then(storedID => {
 	    id = storedID;
+	
+	    /* Scan for peripherals and see if a match is found */
+	    scanSub.subscribe(device => {
+		if (device.id == id) {
+		    /* If so, notify and connect as usual */
+		    this.blservice.connect(device);
+		    let toast = Toast.create({
+			message: "Connected to " + device.name,
+			duration: 2000,
+			position: 'bottom',
+			showCloseButton: true
+                    });
+                    this.nav.present(toast);
+		}
+		/* A device was found that we weren't connected to last */
+		else {}
+	    });
+	    
+	    /* Stop scan at twice usual time because it's in the background */
+	    setTimeout(() => {
+		this.blservice.stopScan();
+		console.log("Scan finished");
+	    }, 2000 * timeout);
 	});
-	
-	/* Scan for peripherals and see if a match is found */
-	scanSub.subscribe(device => {
-	    if (device.id == id) {
-		/* If so, notify and connect as usual */
-		this.blservice.connect(device);
-		let toast = Toast.create({
-                    message: "Connected to " + device.name,
-                    duration: 2000,
-                    position: 'bottom',
-                    showCloseButton: true
-                });
-                this.nav.present(toast);
-	    }
-	    /* A device was found that we weren't connected to last */
-	    else {}
-	});
-	
-	/* Stop scan at twice usual time because it's in the background */
-	setTimeout(() => {
-	    this.blservice.stopScan();
-	    console.log("Scan finished");
-	}, 2000 * timeout);
-	
     }
     
     openPage(page) {
