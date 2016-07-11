@@ -135,7 +135,7 @@ export class BLService {
             },
             /* Button was pressed with no active connection */
             function(result) {
-		alert("You are not currently connected to a device");
+		console.log("You are not currently connected to a device");
             }
 	);
     }

@@ -129,8 +129,6 @@ class MyApp {
 	
 	/* Scan for peripherals and see if a match is found */
 	scanSub.subscribe(device => {
-	    alert("The storage id is: " + id);
-	    alert("The test id is: " + device.id);
 	    if (device.id == id) {
 		/* If so, notify and connect as usual */
 		this.blservice.connect(device);
