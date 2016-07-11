@@ -1,4 +1,4 @@
-import {Page, Events, Platform} from 'ionic-angular';
+import {Page, Events, Platform, NavController, Toast} from 'ionic-angular';
 import {BLService} from '../../services/blservice/blservice';
 
 @Page({
@@ -6,15 +6,16 @@ import {BLService} from '../../services/blservice/blservice';
 })
 export class HomePage {
     static get parameters() {
-	return [[BLService],[Events],[Platform]];
+	return [[BLService],[Events],[Platform],[NavController]];
     }
-    constructor(bl,events,platform) {
+    constructor(bl,events,platform,nav) {
 	this.platform = platform;
 	this.bl = bl; /* Bluetooth */
 	this.events = events; /* Subscriptions */
 	this.linelength = 50; /* Length of the line on the canvas before erasing -- currently unused */
 	this.canvasWidth = window.screen.width - 50;
 	this.canvasHeight = window.screen.height / 3;
+	this.nav = nav;
     }
 
     onPageDidEnter() {
@@ -132,6 +133,35 @@ export class HomePage {
 		this.ctx.moveTo(-2, this.c.height - point);
 		this.i = -2;
 	    }
+    }
+
+    /* Toggle button for enabling and disabling background mode */
+    backgroundModeToggle() {
+	/* If already enabled, disable, change button HTML, notify user */
+	if (cordova.plugins.backgroundMode.isEnabled()) {
+	    cordova.plugins.backgroundMode.disable();
+	    bgButton.innerHTML = "Enable Background Mode";
+	    let toast = Toast.create({
+                message: "Background Mode Disabled",
+                duration: 2000,
+                position: 'bottom',
+                showCloseButton: true
+	    });
+            this.nav.present(toast);
+	}
+	/* Otherwise already disabled, so enable, change button HTML, notify user */
+	else {
+	    cordova.plugins.backgroundMode.enable();
+	    bgButton.innerHTML = "Disable Background Mode";
+	    let toast = Toast.create({
+                message: "Background Mode Enabled",
+                duration: 2000,
+                position: 'bottom',
+                showCloseButton: true
+            });
+            this.nav.present(toast);
+
+	}
     }
 
 }
