@@ -16,35 +16,37 @@ export class HomePage {
 	this.canvasWidth = window.screen.width - 50;
 	this.canvasHeight = window.screen.height / 3;
 	this.nav = nav;
+	this.timeout = 7000;
     }
 
     onPageDidEnter() {
-	
-	var points = [];
-	var head = 0;
+	setTimeout(() => {
+        //this.platform.ready.then(() => {
+	    /* Retrieve information about the canvas and its context */
+	    this.c = document.getElementById("myCanvas");
+	    this.ctx = this.c.getContext("2d");
+	    
+	    /* The first point is actually offscreen so a big jump doesn't get drawn */
+	    this.ctx.moveTo(-2,0);
+	    this.ctx.beginPath();
+	    this.i = -2;
+	    
+	    /* Don't persist through draw() function for some reason */
+	    //this.ctx.strokeStyle = "#00FF00";
+	    //this.ctx.lineWidth = 2;
+	    //var points = [];
+	    //var head = 0;
 
-	/* Retrieve information about the canvas and its context */
-	this.c = document.getElementById("myCanvas");
-	this.ctx = this.c.getContext("2d");
 
-	/* The first point is actually offscreen so a big jump doesn't get drawn */
-	this.ctx.moveTo(-2,0);
-	this.ctx.beginPath();
-	this.i = -2;
+	    /* Set the HTML element for usage if the page is left and re-entered */
+	    this.content = content;
+	    this.msg = msg;
 
-	/* Don't persist through draw() function for some reason */
-	//this.ctx.strokeStyle = "#00FF00";
-	//this.ctx.lineWidth = 2;
-
-	/* If we have a device to connect to, start up the data relay */
-	this.platform.ready().then(() => {
-	    this.connect();
-	});
-
-	/* Set the HTML element for usage if the page is left and re-entered */
-	this.content = content;
-	this.msg = msg;
-
+	    /* If we have a device to connect to, start up the data relay */
+	    this.platform.ready().then(() => {
+		this.connect();
+	    });
+	},this.timeout);
     }
 
 
