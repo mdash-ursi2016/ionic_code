@@ -46,8 +46,8 @@ class MyApp {
     
     initializeApp() {
 	this.platform.ready().then(() => {
-	    // Okay, so the platform is ready and our plugins are available.
-	    // Here you can do any higher level native things you might need.
+	    /* The platform is ready and plugins are available. Here we perform
+	       all high-level native tasks */
 	    
 	    /* Enable background mode and set the heads up notification text */
 	    cordova.plugins.backgroundMode.enable();
@@ -57,6 +57,7 @@ class MyApp {
 		text: "Collecting Data"
 	    });
 
+	    /* Initial auto-connect */
 	    this.resumeOperations();
 
 	    /* Add listeners for app pause/resume and bind "this" to them */
@@ -73,8 +74,14 @@ class MyApp {
     }
 
     pauseOperations() {
+	/* Ensure that background mode is actually on. 
+	   Especially important after initial call */
+	if (!cordova.plugins.backgroundMode.isActive())
+	    return;
+
 	/* On app leave, disconnect immediately */
 	this.blservice.disconnect();
+
 	/* Every 5 minutes, reconnect with this method */
 	setTimeout(() => {
 	    /* We must scan available devices to see if one                                                            
@@ -87,14 +94,16 @@ class MyApp {
 	    
 	    /* Retrieve the last used device id from storage */
             this.storage.retrievePeripheral().then(storedID => {
+
 		id = storedID;
-		alert(id);
-	    
+
 		/* Scan for peripherals and see if a match is found */
 		scanSub.subscribe(device => {
 		    if (device.id == id) {
 			/* If so, connect, and disconnect 30 seconds later */
 			this.blservice.connect(device);
+			/* Propagate paused functionality (next function call will only execute
+			   if background mode is currently active, not just enabled) */
 			setTimeout(() => {
 			    this.pauseOperations();
 			},30000);
@@ -110,11 +119,7 @@ class MyApp {
 		}, 2000 * timeout);
 	    });
 
-	    /* Propgagate paused functionality
-	       Should only occur if background mode currently active */
-	    this.pauseOperations();
-
-	},45000);
+	},300000);
     }
 
     resumeOperations() {
