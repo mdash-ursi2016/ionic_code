@@ -14,6 +14,7 @@ export class BLService {
 			  heartrate: 'b0351694-25e6-4eb5-918c-ca9403ddac47', /* Heart rate characteristic */
 			  ekg: '1bf9168b-cae4-4143-a228-dc7850a37d98', /* EKG characteristic */
 			  timechar: '95d344f4-c6ad-48d8-8877-661ab4d41e5b', /* Date write characteristic */
+			  heartratebundle: '3cd43730-fc61-4ea7-aa18-6e7c3d798d74',
 			  timeout: 3 }; /* Scan time in seconds */
 	
 	/* The storage service */
@@ -64,6 +65,10 @@ export class BLService {
 	this.HRsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartrate);
 	/* Subscription for the EKG data */
 	this.EKGsubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.ekg);
+	/* Subscription for the bundle data */
+	this.HRBundlesubscription = BLE.startNotification(peripheral.id, this.scanInfo.service, this.scanInfo.heartratebundle);
+
+
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint32Array(buffer);
@@ -82,7 +87,13 @@ export class BLService {
 	    /* Republish the data for the home page */
 	    this.events.publish('ekg',data);
 	});
+
+	this.HRBundlesubscription.subscribe(buffer => {
+	    /* Data processing goes here */
+	    /* Data storage goes here */
+	});
     }
+
 
     /* Inform the peripheral of the current date */
     sendDate(peripheral) {
