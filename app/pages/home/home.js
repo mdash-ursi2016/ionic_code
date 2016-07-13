@@ -16,7 +16,7 @@ export class HomePage {
 	this.canvasWidth = window.screen.width - 50;
 	this.canvasHeight = window.screen.height / 3;
 	this.nav = nav;
-	this.timeout = 7000;
+//	this.timeout = 7000;
     }
 
     onPageDidEnter() {
@@ -46,7 +46,7 @@ export class HomePage {
 	    this.platform.ready().then(() => {
 		this.connect();
 	    });
-	},this.timeout);
+	},5000);
     }
 
 

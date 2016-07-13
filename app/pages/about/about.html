@@ -10,8 +10,20 @@
 <ion-content padding class="about">
 
 
-  <button block dark (click)="aboutAlert()">App Info</button>
+  <ion-slides pager>
+    <ion-slide *ngFor="let slide of slides">
+      <img [src]="slide.image" class="slide-image"/>
+      <h2 class="slide-title" [innerHTML]="slide.title"></h2>
+      <p [innerHTML]="slide.description"></p>
+    </ion-slide>
+  </ion-slides>
 
+
+
+
+<!--
+  <button block dark (click)="aboutAlert()">App Info</button>
+-->
 <!--  <p>
     <button primary menuToggle>Toggle Menu</button>
   </p>
