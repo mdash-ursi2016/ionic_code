@@ -39,8 +39,8 @@ export class BluetoothPage {
 
 	/* Checking if a device is already connected */
 	this.bl.checkExistingBluetooth().then(
-	    function() {statusDiv.innerHTML = "Connected";},
-	    function() {statusDiv.innerHTML = "Disconnected";}
+	    () => {statusDiv.innerHTML = "Connected to " + this.bl.getName();},
+	    () => {statusDiv.innerHTML = "Disconnected";}
 	);
     }
 

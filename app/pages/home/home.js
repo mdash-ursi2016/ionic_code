@@ -46,7 +46,7 @@ export class HomePage {
 	    this.platform.ready().then(() => {
 		this.connect();
 	    });
-	},5000);
+	},500);
     }
 
 

@@ -76,6 +76,7 @@ export class BLService {
 	    this.storage.store(new Date(data[1] * 1000),data[0]);
 	    /* Republish the data for the home page */
 	    this.events.publish('bpm',parseInt(data));
+	    
 	    /* Post the data to the server */
 	    //this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
         });
@@ -123,34 +124,21 @@ export class BLService {
 
     /* Called when the user wants to sever the Bluetooth connection */
     disconnect() {
-	let devID = null;
-	var self = this;
-
-	if (this.peripheral) {
-	    /* The device id that is currently connected, or null */
-	    devID = this.peripheral.id;
-	}
-	BLE.isConnected(devID).then(
-            /* Check if connected, and disconnect if so */
-            function(result) {
-		BLE.disconnect(devID).then(
-                    function(dcResult) {
-
-			/* Reset the peripheral ID */
-			self.peripheral = null;
-                    },
-                    /* Could not disconnect for some reason */
-                    function(dcResult) {
-			alert("Error Disconnecting");
-                    });
-            },
-            /* Button was pressed with no active connection */
-            function(result) {
-		console.log("You are not currently connected to a device");
-            }
-	);
+	/* Grab the peripheral from storage and operate on it */
+	this.storage.retrievePeripheral().then(periphID => {
+	    /* If we are connected to this device, connect from it */
+	    BLE.isConnected(periphID).then(() => {
+		BLE.disconnect(periphID).then(() => {
+		}, () => {
+		    /* Never seems to fire with current version of BLE... */
+		    alert("Unsuccessful disconnect");
+		});
+	    }, () => {
+		/* Otherwise we shouldn't be conencted to anything at all */
+		alert("You are not connected to a device");
+	    });
+	});
     }
-
 
     /* On page load, we want the status to reflect if the device is connected already */
     checkExistingBluetooth() {
@@ -159,6 +147,13 @@ export class BLService {
 	}
 	/* Should always be a rejected Promise */
 	else return BLE.isConnected(null);
+    }
+
+    getName() {
+	if (this.peripheral) {
+	    return this.peripheral.name;
+	}
+	else return "Unknown Device";
     }
 
     getSubscription() {

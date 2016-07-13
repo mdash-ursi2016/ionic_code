@@ -50,22 +50,22 @@ class MyApp {
 	       all high-level native tasks */
 	    
 	    /* Enable background mode and set the heads up notification text */
-	    cordova.plugins.backgroundMode.enable();
+/*	    cordova.plugins.backgroundMode.enable();
 	    cordova.plugins.backgroundMode.setDefaults({
 		title: "URSI App",
 		ticker: "",
 		text: "Collecting Data"
 	    });
-
+*/
 	    /* Initial auto-connect */
-	    this.resumeOperations();
+//	    this.resumeOperations();
 
 	    /* Add listeners for app pause/resume and bind "this" to them */
-	    document.addEventListener("pause",this.pauseOperations.bind(this));	    
-	    document.addEventListener("resume",this.resumeOperations.bind(this));
+//	    document.addEventListener("pause",this.pauseOperations.bind(this));	    
+//	    document.addEventListener("resume",this.resumeOperations.bind(this));
 
 	    /* Function that regulates periodic server posting */
-	    this.pushTimer();
+//	    this.pushTimer();
 	
 	    StatusBar.styleDefault();
 	
