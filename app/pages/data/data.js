@@ -147,24 +147,24 @@ export class DataPage {
 	this.makeChart();
     }
 
-    /* Whatever the current time interval is, subtract it from the left bound (startDate).
-       Then double the time interval and redisplay the graph */
-    increaseTime() {
-	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
-	this.timeDiff *= 2;
-	this.startDateString = this.formatLocalDate(this.startDate);
-	this.retrieve();
-    }
-
     /* Whatever the current time interval is, divide it by 2 and add it the left bound.
        Then redisplay the graph */
-    decreaseTime() {
+    zoomIn() {
 	this.timeDiff = Math.floor(this.timeDiff / 2);
 	this.startDate = new Date(this.startDate.getTime() + this.timeDiff);
 	this.startDateString = this.formatLocalDate(this.startDate);
 	this.retrieve();
     }
 
+    /* Whatever the current time interval is, subtract it from the left bound (startDate).
+       Then double the time interval and redisplay the graph */
+    zoomOut() {
+	this.startDate = new Date(this.startDate.getTime() - this.timeDiff);
+	this.timeDiff *= 2;
+	this.startDateString = this.formatLocalDate(this.startDate);
+	this.retrieve();
+    }
+    
     /* Shift both dates to the left by half of the total amount of time currently being displayed */
     shiftLeft() {
 	this.timeDiff = Math.floor(this.timeDiff / 2);
