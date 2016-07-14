@@ -54,7 +54,10 @@ export class BLService {
 	    this.storage.storePeripheral(peripheral.id);
 	    this.peripheral = peripheral;
             this.connected(peripheral);
-        }, error => {console.log("Peripheral not found.");});
+        }, error => {
+	    console.log("Peripheral was disconnected");
+	    this.disconnect();
+	});
     }
 
     /* Record incoming data in storage */
@@ -95,23 +98,26 @@ export class BLService {
 	this.HRBundlesubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
 
-	    let bpmArray = [data[4],data[9],data[14],data[19],data[24]];
+	    /* BPMs are located every 5 indices */
+	    let bpmArray = [data[4],data[9],data[14],data[19]];
 
+	    /* Dates must be calculated in reverse order */
 	    let dateArray = [
 		this.calcDate(data[3],data[2],data[1],data[0]),
 		this.calcDate(data[8],data[7],data[6],data[5]),
 		this.calcDate(data[13],data[12],data[11],data[10]),
-		this.calcDate(data[18],data[17],data[16],data[15]),
-		this.calcDate(data[23],data[22],data[21],data[20])
+		this.calcDate(data[18],data[17],data[16],data[15])
 	    ];
 
-	    console.log(bpmArray);
-	    console.log(dateArray);
-	    
-	    /* Data storage goes here */
+	    /* Push all data points to storage 
+	       (dates * 1000 for ms format ) */
+	    for (var i=0; i < bpmArray.length; i++) {
+		this.storage.store(new Date(dateArray[i] * 1000),bpmArray[i]);
+	    }
 	});
     }
 
+    /* Format a unix epoch from individual bytes */
     calcDate(n1,n2,n3,n4) {
 	return (n1 << 24) + (n2 << 16) + (n3 << 8) + n4;
     }

@@ -82,7 +82,7 @@ export class BluetoothPage {
 	this.bl.connect(device);
 
 	/* Remove the device from the list of displayed devices */
-	this.listItems.splice(this.listItems.indexOf(device),1);
+	this.listItems = [];
 	statusDiv.innerHTML = "Connected to " + device.name;
     }
 	
