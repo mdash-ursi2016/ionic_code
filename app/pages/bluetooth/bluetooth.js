@@ -10,7 +10,7 @@ export class BluetoothPage {
 	return [[BLService], [NavController]];
     }
 
-    constructor(bl,nav,events) {
+    constructor(bl,nav) {
 	this.bl = bl;
 	this.nav = nav;
 
