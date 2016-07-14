@@ -41,7 +41,8 @@ export class HomePage {
 	    /* Set the HTML element for usage if the page is left and re-entered */
 	    this.content = content;
 	    this.msg = msg;
-
+	    this.instruct = instruct;
+	    
 	    /* If we have a device to connect to, start up the data relay */
 	    this.platform.ready().then(() => {
 		this.connect();
@@ -56,6 +57,7 @@ export class HomePage {
 	var connectSub = this.bl.getSubscription();
 	if (!connectSub) return;
 	this.msg.innerHTML = "";
+	this.instruct.innerHTML = "";
 	
 	/* Display the BPM provided by BLService*/
 	this.events.subscribe('bpm', (data) => {
