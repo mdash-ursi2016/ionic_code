@@ -71,11 +71,14 @@ export class BLService {
 
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
-	    var data = new Uint32Array(buffer);
+	    var data = new Uint8Array(buffer);
+	    //let date = (data[3] << 24) + (data[2] << 16) + (data[1] << 8) + (data[0]);
+	    let date = this.calcDate(data[3],data[2],data[1],data[0]);
+
 	    /* Store data (date * 1000 to account for milliseconds) */
-	    this.storage.store(new Date(data[1] * 1000),data[0]);
+	    this.storage.store(new Date(date * 1000),data[4]);
 	    /* Republish the data for the home page */
-	    this.events.publish('bpm',parseInt(data));
+	    this.events.publish('bpm',parseInt(data[4]));
 	    
 	    /* Post the data to the server */
 	    //this.httpservice.makePostRequest(data[0],new Date(data[1] * 1000));
@@ -90,9 +93,27 @@ export class BLService {
 	});
 
 	this.HRBundlesubscription.subscribe(buffer => {
-	    /* Data processing goes here */
+	    var data = new Uint8Array(buffer);
+
+	    let bpmArray = [data[4],data[9],data[14],data[19],data[24]];
+
+	    let dateArray = [
+		this.calcDate(data[3],data[2],data[1],data[0]),
+		this.calcDate(data[8],data[7],data[6],data[5]),
+		this.calcDate(data[13],data[12],data[11],data[10]),
+		this.calcDate(data[18],data[17],data[16],data[15]),
+		this.calcDate(data[23],data[22],data[21],data[20])
+	    ];
+
+	    console.log(bpmArray);
+	    console.log(dateArray);
+	    
 	    /* Data storage goes here */
 	});
+    }
+
+    calcDate(n1,n2,n3,n4) {
+	return (n1 << 24) + (n2 << 16) + (n3 << 8) + n4;
     }
 
 
@@ -124,10 +145,16 @@ export class BLService {
 
     /* Called when the user wants to sever the Bluetooth connection */
     disconnect() {
+
 	/* Grab the peripheral from storage and operate on it */
 	this.storage.retrievePeripheral().then(periphID => {
 	    /* If we are connected to this device, connect from it */
 	    BLE.isConnected(periphID).then(() => {
+
+		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartrate).then();
+		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.ekg).then();
+		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartratebundle).then();
+
 		BLE.disconnect(periphID).then(() => {
 		}, () => {
 		    /* Never seems to fire with current version of BLE... */

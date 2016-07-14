@@ -31,12 +31,12 @@ export class AboutPage {
 	  {
 	      title: "Data Incoming",
 	      description: "Finally you can start viewing data! The <b>Home Page</b> will automatically display incoming heart rate information. The center box will display a live EKG graph and a BPM readout will be displayed as well.",
-	      image: "img/slidebox_5.png",
+	      image: "img/slidebox_6.png",
 	  },
 	  {
 	      title: "Graphing",
 	      description: "You can also view long term data from the server on the <b>Data Page</b>. The last 24 hours are automatically displayed. Clicking <b>+/-</b> will zoom in and out out and the <b><-/-></b> will slide to different dates.",
-	      image: "img/slidebox_6.png",
+	      image: "img/slidebox_5.png",
 	  }
       ];
   }

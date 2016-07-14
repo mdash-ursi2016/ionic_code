@@ -19,8 +19,8 @@ export class StorageService {
     store(date,newVal) {
 	this.storage.query('INSERT INTO dataTable(date,value) VALUES(?,?)',[date,newVal]).then(
 	    function() {}, //{alert("Stored data: " + newVal);},
-	    function() {alert("Failed to store data");}
-	    //function() {}
+	    //function() {alert("Failed to store data");}
+	    function() {}
 	);
     }
     

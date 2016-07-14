@@ -10,7 +10,7 @@ export class BluetoothPage {
 	return [[BLService], [NavController]];
     }
 
-    constructor(bl,nav) {
+    constructor(bl,nav,events) {
 	this.bl = bl;
 	this.nav = nav;
 
@@ -42,6 +42,7 @@ export class BluetoothPage {
 	    () => {statusDiv.innerHTML = "Connected to " + this.bl.getName();},
 	    () => {statusDiv.innerHTML = "Disconnected";}
 	);
+
     }
 
     /* Scan for a device */
@@ -79,6 +80,7 @@ export class BluetoothPage {
        Connect to that device */
     connect(device) {
 	this.bl.connect(device);
+
 	/* Remove the device from the list of displayed devices */
 	this.listItems.splice(this.listItems.indexOf(device),1);
 	statusDiv.innerHTML = "Connected to " + device.name;
