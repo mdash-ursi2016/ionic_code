@@ -75,7 +75,7 @@ export class BLService {
 	/* Subscribe to the BPM */
 	this.HRsubscription.subscribe(buffer => {
 	    var data = new Uint8Array(buffer);
-	    //let date = (data[3] << 24) + (data[2] << 16) + (data[1] << 8) + (data[0]);
+
 	    let date = this.calcDate(data[3],data[2],data[1],data[0]);
 
 	    /* Store data (date * 1000 to account for milliseconds) */

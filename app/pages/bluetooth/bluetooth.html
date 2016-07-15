@@ -1,5 +1,5 @@
 
-<ion-navbar *navbar>
+<ion-navbar favorite *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
@@ -9,18 +9,10 @@
 
 <ion-content padding class="bluetooth">
 
-  <p>
-     Settings for Bluetooth.
-  </p>
-
   <button block dark (click)="scan()">Scan for Devices</button>
   <button id="dc" block stable (click)="disconnect()">Disconnect from Device</button>
 
   <!-- Display the current status -->
-  
-  <p> Status:</p> 
-  <div id="statusDiv">Disconnected</div>
-  <br>
 
   
   <ion-list>
@@ -31,5 +23,8 @@
     </ion-item>
   </ion-list>
 
-
 </ion-content>
+
+<ion-footer>
+  <h3 style="text-align:center;font-family:Arial"><b>Status: {{statusDiv}}</b></h3>
+</ion-footer>

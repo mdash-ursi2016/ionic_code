@@ -16,12 +16,13 @@ export class BluetoothPage {
 
 	/* List of of found devices on scan */
 	this.listItems = [];
+	this.statusDiv = "Undefined";
     }
 
     onPageLoaded()
     {
 	/* Ensuring that Bluetooth is on */
-	statusDiv.innerHTML = "Initializing";
+	this.statusDiv = "Initializing";
 	var self = this;
 	document.addEventListener('deviceready', function () {
 	    /* If already enabled, do nothing */
@@ -39,8 +40,8 @@ export class BluetoothPage {
 
 	/* Checking if a device is already connected */
 	this.bl.checkExistingBluetooth().then(
-	    () => {statusDiv.innerHTML = "Connected to " + this.bl.getName();},
-	    () => {statusDiv.innerHTML = "Disconnected";}
+	    () => {this.statusDiv = "Connected to " + this.bl.getName();},
+	    () => {this.statusDiv = "Disconnected";}
 	);
 
     }
@@ -49,7 +50,7 @@ export class BluetoothPage {
     scan() {
 	/* The list of found devices should be empty on scan start */
 	this.listItems = [];
-	statusDiv.innerHTML = "Scanning";
+	this.statusDiv = "Scanning";
 
 	/* BL scanning service returns a [timeout,subscription] pair */
 	var scanner = this.bl.startScan();
@@ -71,7 +72,7 @@ export class BluetoothPage {
 	/* After the timeout, stop scanning and remove the loader */
 	setTimeout(() => {
 	    this.bl.stopScan();
-	    statusDiv.innerHTML = "Finished Scanning";
+	    this.statusDiv = "Finished Scanning";
 	    loading.dismiss();
 	}, 1000 * timeout);
     }
@@ -83,12 +84,12 @@ export class BluetoothPage {
 
 	/* Remove the device from the list of displayed devices */
 	this.listItems = [];
-	statusDiv.innerHTML = "Connected to " + device.name;
+	this.statusDiv = "Connected to " + device.name;
     }
 	
     /* Disconnect from any connected device */
     disconnect() {
 	this.bl.disconnect();
-	statusDiv.innerHTML = "Disconnected";
+	this.statusDiv = "Disconnected";
     }
 }
