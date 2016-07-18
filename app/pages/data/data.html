@@ -8,12 +8,6 @@
 
 <ion-content padding class="data">
 
-  <h3>Data Page</h3>
-
-  <button block (click)="getToken()">Obtain Authorization Token</button>
-
-  
-
   <ion-item>
     <ion-label>Start Date</ion-label>
     <ion-datetime displayFormat="MMM DD, h:mm A" pickerFormat="YYYY MMM DD HH mm" [(ngModel)]="startDateString"></ion-datetime>
@@ -34,10 +28,6 @@
   <br>
 
   <p> The current time interval is {{convertMS(timeDiff)}} </p>
-  
-  <br>
-
-  <canvas id="chart" width={{canvasWidth}} height={{canvasHeight}}>Charts not supported</canvas>
 
   <button clear (click)="zoomIn()">
     <ion-icon name="add"></ion-icon>
@@ -54,6 +44,16 @@
   <button clear (click)="shiftRight()">
     <ion-icon name="arrow-round-forward"></ion-icon>
   </button>
+  
+  <br>
+
+  <canvas id="chart" width={{canvasWidth}} height={{canvasHeight}}>Charts not supported</canvas>
+
 
 
 </ion-content>
+
+
+<ion-footer>
+  <button full (click)="getToken()">Obtain Authorization Token</button>
+</ion-footer>

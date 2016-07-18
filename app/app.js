@@ -86,10 +86,7 @@ class MyApp {
 	setTimeout(() => {
 	    /* We must scan available devices to see if one                                                            
                has been connected to last */
-            let scanner = this.blservice.startScan();
-            var timeout = scanner[0];
-	    var scanSub = scanner[1];
-	    
+            var scanSub = this.blservice.startScan();  
             var id;
 	    
 	    /* Retrieve the last used device id from storage */
@@ -116,7 +113,7 @@ class MyApp {
 		setTimeout(() => {
 		    this.blservice.stopScan();
 		    console.log("Scan finished");
-		}, 2000 * timeout);
+		}, 6000);
 	    });
 
 	},300000);
@@ -125,9 +122,7 @@ class MyApp {
     resumeOperations() {
 	/* On app resume, we must scan available devices to see if one
 	   has been connected to last */
-	let scanner = this.blservice.startScan();
-	var timeout = scanner[0];
-	var scanSub = scanner[1];
+	var scanSub = this.blservice.startScan();
 	
 	var id;
 	

@@ -35,3 +35,5 @@ $colors: (
   favorite:   #69BB7B,
   green:      #009933
 );
+
+$loading-md-spinner-color: color($colors,favorite);

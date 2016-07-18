@@ -12,7 +12,7 @@
   <button block dark (click)="scan()">Scan for Devices</button>
   <button id="dc" block stable (click)="disconnect()">Disconnect from Device</button>
 
-  <!-- Display the current status -->
+
 
   
   <ion-list>
@@ -23,8 +23,23 @@
     </ion-item>
   </ion-list>
 
+
+
+
+
 </ion-content>
+ 
+
 
 <ion-footer>
-  <h3 style="text-align:center;font-family:Arial"><b>Status: {{statusDiv}}</b></h3>
+
+  <h6 style="text-align:center">Scan Time (seconds)</h6>
+  <ion-item>
+    <!--    <ion-range min="2" max="10" pin="true" snaps="true" [(ngModel)]="scanTime" favorite>-->
+    <ion-icon range-left small name="timer"></ion-icon>
+    <ion-icon range-right name="timer"></ion-icon>
+    <!--</ion-range>-->
+  </ion-item>
+
+  <h3 style="text-align:center;font-family:Arial;color:#333399"><b>Status: {{statusDiv}}</b></h3>
 </ion-footer>

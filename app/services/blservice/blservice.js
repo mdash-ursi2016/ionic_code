@@ -39,7 +39,7 @@ export class BLService {
 
     /* Return a pair including the scan timeout and the scan subscription */
     startScan() {
-        return [this.scanInfo.timeout, BLE.startScan([this.scanInfo.service])];
+        return BLE.startScan([this.scanInfo.service]);
     }
     
     /* Stop scanning */
@@ -157,6 +157,9 @@ export class BLService {
 	    /* If we are connected to this device, connect from it */
 	    BLE.isConnected(periphID).then(() => {
 
+		/* Reset subscriptions so if anything requests them they are null */
+		this.HRsubscription = this.EKGsubscription = this.HRBundlesubscription = null;
+
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartrate).then();
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.ekg).then();
 		BLE.stopNotification(periphID, this.scanInfo.service, this.scanInfo.heartratebundle).then();
@@ -182,13 +185,17 @@ export class BLService {
 	else return BLE.isConnected(null);
     }
 
+    /* Return name of device */
     getName() {
 	if (this.peripheral) {
 	    return this.peripheral.name;
 	}
 	else return "Unknown Device";
     }
-
+    
+    /* Returns the heart rate subscription.
+       Currently used by home page to know if
+       it should subscribe to data */
     getSubscription() {
 	return this.HRsubscription;
     }

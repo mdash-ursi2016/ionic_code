@@ -1,4 +1,4 @@
-import {Page, Alert, NavController, Loading} from 'ionic-angular';
+import {Page, Alert, NavController, Loading, Range} from 'ionic-angular';
 import {BLService} from '../../services/blservice/blservice';
 
 @Page({
@@ -17,6 +17,7 @@ export class BluetoothPage {
 	/* List of of found devices on scan */
 	this.listItems = [];
 	this.statusDiv = "Undefined";
+	this.scanTime = 3;
     }
 
     onPageLoaded()
@@ -53,9 +54,7 @@ export class BluetoothPage {
 	this.statusDiv = "Scanning";
 
 	/* BL scanning service returns a [timeout,subscription] pair */
-	var scanner = this.bl.startScan();
-	var timeout = scanner[0];
-	var scanSub = scanner[1];
+	var scanSub = this.bl.startScan();
 	
 	/* Create a loader for during the scan */
 	let loading = Loading.create({
@@ -74,7 +73,7 @@ export class BluetoothPage {
 	    this.bl.stopScan();
 	    this.statusDiv = "Finished Scanning";
 	    loading.dismiss();
-	}, 1000 * timeout);
+	}, 1000 * this.scanTime);
     }
 
     /* Executed when a user selects a device from the list;
